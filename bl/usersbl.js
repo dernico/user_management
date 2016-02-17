@@ -5,12 +5,10 @@ users.findByToken = function(token, callback) {
 
 	models.user.find({token: token},function(err,users){  
 
-		var len = users.length;  
-
-		if(len == 0){ 
- 			callback(false);    
+		if(users.length > 0){ 
+ 			callback(users[0]);    
 		}else{    
- 			callback(true);  
+ 			callback(undefined);  
 		}
 	});
 };
