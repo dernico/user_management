@@ -2,7 +2,8 @@
 var chgpass = require('../config/chgpass'); 
 var register = require('../config/register'); 
 var login = require('../config/login');
-var userBl = require('../bl/users');
+var userBl = require('../bl/usersbl');
+var notesBl = require('../bl/notesbl');
 
 module.exports = function(app) {
 
@@ -13,17 +14,52 @@ module.exports = function(app) {
 
           if(!token) return res.end("No token no way ...");
 
-          userBl.findByToken(token, function(found){
-               if(found) return next();
+          userBl.findByToken(token, function(user){
+               if(user) {
+                    req._user = user;
+                    return next();
+               }
                res.end("nice try :D");
           });
-     };        
-
+     };
 
      app.get('/', secure, function(req, res) {       
 
-          res.end("Node-Android-Project");    
-     });     
+          res.end("Note-Android-Project");    
+     });
+
+
+     var deleteNote = function(){
+
+     }
+
+     var addNote = function(req, res){
+          var title = req.query.title;
+          var content = req.query.content;
+          var startDate = req.query.startDate;
+          var endDate = req.query.endDate;
+
+          title = title ? title : "No Title";
+          content = content ? content : "";
+          startDate = startDate ? new Date(Date.parse(startDate)) : null;
+          endDate = endDate ? new Date(Date.parse(endDate)) : null;
+
+          notesBl.addNote(title, content, startDate, endDate, function(err){
+               res.json({error: error})
+          });
+
+     };
+
+     app.get('addnote', secure, addNote);
+
+     var getNotes = function(req, res){
+          notesBl.getNotes(req._user._id, function(err, notes){
+               res.json({error: err, notes: notes});
+          });
+     }
+
+     app.get('/notes', secure, getNotes);
+
 
      var _login = function(req,res){        
           var email = req.body.email;             
