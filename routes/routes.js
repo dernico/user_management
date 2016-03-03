@@ -4,6 +4,7 @@ var register = require('../config/register');
 var login = require('../config/login');
 var userBl = require('../bl/usersbl');
 var notesBl = require('../bl/notesbl');
+var blModels = require('../bl/models');
 
 module.exports = function(app) {
 
@@ -44,13 +45,15 @@ module.exports = function(app) {
           startDate = startDate ? new Date(Date.parse(startDate)) : null;
           endDate = endDate ? new Date(Date.parse(endDate)) : null;
 
-          notesBl.addNote(title, content, startDate, endDate, function(err){
-               res.json({error: error})
+          var newNote = new blModels.note(title, content, startDate, endDate);
+
+          notesBl.addNote(req._user._id, newNote, function(err){
+               res.json({error: err})
           });
 
      };
 
-     app.get('addnote', secure, addNote);
+     app.get('/addnote', secure, addNote);
 
      var getNotes = function(req, res){
           notesBl.getNotes(req._user._id, function(err, notes){
