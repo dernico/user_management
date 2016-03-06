@@ -19,7 +19,7 @@ var noteSchema = mongoose.Schema({
 	title: String,
 	content: String,
 	startDate: Date,
-	endDate: Date,
+	endDate: Date
 });
 
 mongoose.connect('mongodb://localhost:27017/userManagement'); 

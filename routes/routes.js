@@ -30,9 +30,22 @@ module.exports = function(app) {
      });
 
 
-     var deleteNote = function(){
-
+     var deleteNote = function(req, res){
+          var userid = req._user._id;
+          var noteid = req.query.noteid ? req.query.noteid : null;
+          if(!noteid && !userid) {
+               res.json({error: "no noteid or userid"});
+          }else{
+               notesBl.deleteNote(userid, noteid, function(err){
+                    if(err){
+                         res.json({error: err});
+                    }else{
+                         res.json({message: "successful"});
+                    }
+               });
+          }
      }
+     app.get('/deletenote', secure, deleteNote);
 
      var addNote = function(req, res){
           var title = req.query.title;

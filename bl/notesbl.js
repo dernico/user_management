@@ -46,13 +46,17 @@ notes.addNote = function(userid, blNote, callback){
 
 	newNote.save(function(err, savedNote){
 		if(err){
-			callback(err);
+			models.notes.findById(userid).remove(function(removeError){
+				console.log(removeError);
+				callback(err);
+			});
 		}
 		else{
 
 			var newUserNote = new models.userNotes({
 				userId: userid,
-				noteId: savedNote._id
+				noteId: savedNote._id,
+				deleted: false
 			});
 
 			newUserNote.save(function(err){
@@ -64,6 +68,50 @@ notes.addNote = function(userid, blNote, callback){
 				}
 			});
 		}
+	});
+};
+
+notes.deleteNote = function(userid, noteid, callback){
+	console.log("delete userid: " + userid + " noteid: " + noteid);
+
+	models.userNotes.find({userId: userid, noteId: noteid}, function(err, usernote){
+		if(err){
+			callback(err);
+			return;
+		}
+		if(usernote.length == 1) {
+			models.note.findById(noteid, function(err, note){
+				if(err){
+					callback(err);
+					return;
+				}
+				if(!note){
+					callback({error: "note nicht gefunden"});
+					return;
+				}
+
+				models.userNotes.findById(usernote[0]._id).remove(function(err){
+					if(err){
+						callback(err);
+						return;
+					}
+					models.note.findById(noteid).remove(function(err){
+						if(err){
+							callback(err);
+							return;
+						}
+						callback(err);
+					});
+					
+				});
+
+				
+			});
+		}else{
+			console.log("No usernote found or too much.");
+			callback({error: "no usernote found"});
+		}
+
 	});
 };
 
