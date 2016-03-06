@@ -100,22 +100,6 @@ notes.deleteNote = function(userid, noteid, callback){
 					}
 					callback(err);
 				}).exec();
-
-				/*var noteids = [];
-				usernotes.each(function(usernote){
-
-					noteids.push(usernote._id);
-				});
-
-				models.userNotes.find({ _id: {$in: noteids} }).remove(function(err){
-					if(err){
-						callback(err);
-						return;
-					}
-					
-				});
-				*/
-				
 			});
 		}else{
 			console.log("No usernote found or too much.");
