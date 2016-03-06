@@ -55,8 +55,7 @@ notes.addNote = function(userid, blNote, callback){
 
 			var newUserNote = new models.userNotes({
 				userId: userid,
-				noteId: savedNote._id,
-				deleted: false
+				noteId: savedNote._id
 			});
 
 			newUserNote.save(function(err){
@@ -74,12 +73,15 @@ notes.addNote = function(userid, blNote, callback){
 notes.deleteNote = function(userid, noteid, callback){
 	console.log("delete userid: " + userid + " noteid: " + noteid);
 
-	models.userNotes.find({userId: userid, noteId: noteid}, function(err, usernote){
+	//TODO: Add security check on ever usernote if one usernote is at least
+	// ownt by a user
+
+	models.userNotes.find({noteId: noteid}, function(err, usernotes){
 		if(err){
 			callback(err);
 			return;
 		}
-		if(usernote.length == 1) {
+		if(usernotes.length > 0) {
 			models.note.findById(noteid, function(err, note){
 				if(err){
 					callback(err);
@@ -90,21 +92,29 @@ notes.deleteNote = function(userid, noteid, callback){
 					return;
 				}
 
-				models.userNotes.findById(usernote[0]._id).remove(function(err){
+
+				models.note.findById(noteid).remove(function(err){
 					if(err){
 						callback(err);
 						return;
 					}
-					models.note.findById(noteid).remove(function(err){
-						if(err){
-							callback(err);
-							return;
-						}
-						callback(err);
-					});
-					
+					callback(err);
+				}).exec();
+
+				/*var noteids = [];
+				usernotes.each(function(usernote){
+
+					noteids.push(usernote._id);
 				});
 
+				models.userNotes.find({ _id: {$in: noteids} }).remove(function(err){
+					if(err){
+						callback(err);
+						return;
+					}
+					
+				});
+				*/
 				
 			});
 		}else{
@@ -112,7 +122,49 @@ notes.deleteNote = function(userid, noteid, callback){
 			callback({error: "no usernote found"});
 		}
 
-	});
+	}).remove().exec();
 };
+
+notes.shareNote = function(shareEmail, noteid, callback){
+
+	models.user.find({email: shareEmail}, function(err, users){
+		if(err){
+			callback(err);
+			return;
+		}
+		if(users.length == 0){
+			callback({error: "no user found"});
+			return;
+		}
+		if(users.length > 1){
+			//TODO: Possible? Hopefully not :D
+		}
+		var shareid = users[0]._id;
+
+		models.userNotes.find({userId: shareid, noteId: noteid}, function(err, usernotes){
+			if(err){
+				callback(err);
+				return;
+			}
+			if(usernotes.length == 1){
+				callback({error: "already shared"});
+				return;
+			}
+
+			var newUserNote = new models.userNotes({
+				userId: shareid,
+				noteId: noteid
+			});
+			newUserNote.save(function(err){
+				if(err){
+					callback(err);
+					return;
+				}
+				callback({message: "successful shared"});
+			});
+
+		});
+	});
+}
 
 module.exports = notes;

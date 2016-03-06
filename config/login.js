@@ -1,11 +1,11 @@
 var crypto = require('crypto'); 
 var rand = require('csprng'); 
 var mongoose = require('mongoose');
-var user = require('./models');  
+var models = require('../config/models');  
 
 module.exports.login = function(email,password,callback) {  
 
-	user.find({email: email},function(err,users){  
+	models.user.find({email: email},function(err,users){  
 
 		if(users.length != 0){  
 

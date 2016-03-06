@@ -29,6 +29,16 @@ module.exports = function(app) {
           res.end("Note-Android-Project");    
      });
 
+     var shareNote = function(req, res){
+          var noteid = req.query.noteid;
+          var sharedEmail = req.query.sharedEmail;
+
+          notesBl.shareNote(sharedEmail, noteid, function(err){
+               res.json(err);
+          });
+     };
+     app.get('/sharenote', secure, shareNote);
+
 
      var deleteNote = function(req, res){
           var userid = req._user._id;
@@ -44,7 +54,7 @@ module.exports = function(app) {
                     }
                });
           }
-     }
+     };
      app.get('/deletenote', secure, deleteNote);
 
      var addNote = function(req, res){
