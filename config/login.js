@@ -11,11 +11,18 @@ module.exports.login = function(email,password,callback) {
 
 			var temp = users[0].salt; 
 			var hash_db = users[0].hashed_password; 
-			var id = users[0].token; 
+			var token = users[0].token; 
+			var _id = users[0]._id;
+			var email = users[0].email;
 			var newpass = temp + password; 
 			var hashed_password = crypto.createHash('sha512').update(newpass).digest("hex"); 
 			if(hash_db == hashed_password){  
-				callback({'response':"Login Sucess",'res':true,'token':id});  
+				callback({
+					'response':"Login Sucess",
+					'res':true,
+					'token':token, 
+					'email': email, 
+					'_id': _id});  
 			}else{  
 				callback({'response':"Invalid Password",'res':false});  
 			} 

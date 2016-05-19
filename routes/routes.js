@@ -88,6 +88,8 @@ module.exports = function(app) {
 
 
      var _login = function(req,res){        
+          console.log("try loggin with body: " + req.body);
+
           var email = req.body.email;             
           var password = req.body.password;
 
@@ -95,9 +97,14 @@ module.exports = function(app) {
           if(!email) email = req.query.email;
           if(!password) password = req.query.password;    
 
+
+
           login.login(email,password,function (found) {           
-               console.log(found);             
-               res.json(found);    
+               console.log(found);
+               if(!found.res){
+                    res.status(404);
+               }
+               res.json(found);
           });    
      };
 
