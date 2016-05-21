@@ -22,7 +22,10 @@ var noteSchema = mongoose.Schema({
 	endDate: Date
 });
 
-mongoose.connect('mongodb://localhost:27017/userManagement'); 
+var connection = process.env.MONGOLAB_URI;
+console.log("connection to mongodb: " + connection);
+//mongoose.connect('mongodb://localhost:27017/userManagement'); 
+mongoose.connect(connection);
 var models = {};
 models.user = mongoose.model('users', userSchema);
 models.userNotes = mongoose.model('userNotes', userNoteSchema);
