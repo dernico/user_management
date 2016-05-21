@@ -50,7 +50,7 @@ module.exports = function(app) {
                     if(err){
                          res.json({error: err});
                     }else{
-                         res.json({message: "successful"});
+                         res.json({error: null, message: "successful"});
                     }
                });
           }
