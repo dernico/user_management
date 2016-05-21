@@ -13,13 +13,18 @@ module.exports = function(app) {
           var token = req.body.token;
           if(!token) token = req.query.token; 
 
-          if(!token) return res.end("No token no way ...");
+          if(!token) 
+          {
+               res.status(403);
+               return res.end("No token no way ...");
+          }
 
           userBl.findByToken(token, function(user){
                if(user) {
                     req._user = user;
                     return next();
                }
+               res.status(403);
                res.end("nice try :D");
           });
      };
@@ -96,7 +101,6 @@ module.exports = function(app) {
           if(!password) password = req.query.password;    
 
           login.login(email,password,function (found) {           
-               console.log(found);
                if(!found.res){
                     res.status(404);
                }
