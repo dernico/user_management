@@ -33,19 +33,19 @@ module.exports.register = function(email,password,callback) {
 
 				    	if(err) {
 				    		console.error(err);
-				    		callback({'response': "Error creating"});
+				    		callback({'success': false, 'response': "Error creating"});
 				    	}else{
-				    		callback({'response':"Sucessfully Registered"});  
+				    		callback({'success': true, 'response':"Sucessfully Registered"});  
 				    	}
 					}); 
 				}else{    
-	     			callback({'response':"Email already Registered"});  
+	     			callback({'success': false, 'response':"Email already Registered"});  
 				}
 			});
 		}else{      
-	     callback({'response':"Password Weak"});  
+	     callback({'success': false, 'response':"Password Weak"});  
 		}
 	}else{    
-		callback({'response':"Email Not Valid"});  
+		callback({'success': false, 'response':"Email Not Valid"});  
 	} 
 }
