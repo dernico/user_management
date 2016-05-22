@@ -19,8 +19,6 @@ notes.getNotes = function(userid, callback){
 		var noteids = [];
 		usernotes.each(function(usernote){
 			usernote.noteId = mongoose.Types.ObjectId(usernote.noteId);
-
-			console.log(usernote.noteId);
 			noteids.push(usernote.noteId);
 		});
 
@@ -34,6 +32,17 @@ notes.getNotes = function(userid, callback){
 		});
 		
 	});
+}
+
+notes.updateNote = function(note, callback){
+	var id = mongoose.Types.ObjectId(note._id);
+	var set = {
+		title: note.title,
+		content: note.content,
+		startDate: note.startDate,
+		endDate: note.endDate
+	};
+	models.note.update( {_id: id}, {$set: set}, callback);
 }
 
 notes.addNote = function(userid, blNote, callback){

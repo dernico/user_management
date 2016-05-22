@@ -78,10 +78,21 @@ module.exports = function(app) {
           notesBl.addNote(req._user._id, newNote, function(err){
                res.json({error: err})
           });
-
      };
 
      app.get('/addnote', secure, addNote);
+
+     var updateNote = function(req, res){
+          notesBl.updateNote(req.body, function(err, note){
+               var message = "";
+               if(err){
+                    res.status(500);
+                    message = err;
+               }
+               res.send(message);
+          });
+     };
+     app.post('/updatenote', secure, updateNote);
 
      var getNotes = function(req, res){
           notesBl.getNotes(req._user._id, function(err, notes){
