@@ -83,6 +83,7 @@ module.exports = function(app) {
      app.get('/addnote', secure, addNote);
 
      var updateNote = function(req, res){
+
           notesBl.updateNote(req.body, function(err, note){
                var message = "";
                if(err){
