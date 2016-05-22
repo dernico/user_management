@@ -42,7 +42,7 @@ notes.updateNote = function(note, callback){
 		startDate: note.startDate,
 		endDate: note.endDate
 	};
-	models.note.update( {_id: id}, {$set: set}, callback);
+	models.note.findByIdAndUpdate( id, {$set: set}, callback);
 }
 
 notes.addNote = function(userid, blNote, callback){

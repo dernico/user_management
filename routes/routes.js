@@ -89,7 +89,7 @@ module.exports = function(app) {
                     res.status(500);
                     message = err;
                }
-               res.send(message);
+               res.json(note);
           });
      };
      app.post('/updatenote', secure, updateNote);
