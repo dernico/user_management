@@ -5,6 +5,8 @@ var login = require('../config/login');
 var userBl = require('../bl/usersbl');
 var notesBl = require('../bl/notesbl');
 var blModels = require('../bl/models');
+var placesbl = require('../bl/placesbl');
+var logger = require('../logger');
 
 module.exports = function(app) {
 
@@ -33,6 +35,30 @@ module.exports = function(app) {
 
           res.end("Note-Android-Project");    
      });
+
+     var places = function(req, res){
+
+          placesbl.textsearch(req.query.query, function(err, result){
+               if(err){
+                    logger.log(err);
+                    res.status(500);
+               }
+               res.json(result);
+          });
+     };
+     app.get('/places', secure, places);
+
+     var placesAutocomplete = function(req, res){
+
+          placesbl.autocomplete(req.query.input, function(err, result){
+               if(err){
+                    logger.log(err);
+                    res.status(500);
+               }
+               res.json(result);
+          });
+     };
+     app.get('/places/autocomplete', secure, placesAutocomplete);
 
      var shareNote = function(req, res){
           var noteid = req.query.noteid;
