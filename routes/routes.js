@@ -38,7 +38,7 @@ module.exports = function(app) {
 
      var places = function(req, res){
 
-          placesbl.textsearch(req.query.query, function(err, result){
+          placesbl.textsearch(req.query.q, function(err, result){
                if(err){
                     logger.log(err);
                     res.status(500);
@@ -50,7 +50,7 @@ module.exports = function(app) {
 
      var placesAutocomplete = function(req, res){
 
-          placesbl.autocomplete(req.query.input, function(err, result){
+          placesbl.autocomplete(req.query.q, function(err, result){
                if(err){
                     logger.log(err);
                     res.status(500);
@@ -191,10 +191,10 @@ module.exports = function(app) {
           var code = req.body.code;       
           var npass = req.body.newpass;       
 
-     chgpass.respass_chg(email,code,npass,function(found){           
-          console.log(found);             
-          res.json(found);    
-     
-     });     
+          chgpass.respass_chg(email,code,npass,function(found){           
+               console.log(found);             
+               res.json(found);    
+          
+          });     
      });  
 };
