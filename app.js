@@ -10,9 +10,11 @@ var cors = require('cors');
 
 var passport = require('passport');
 var google = require('googleapis');
+var jwt = require('jsonwebtoken');
 var gsecrets = require('./clientSecret').client;
 var models = require('./config/models');
 var userbl = require('./bl/usersbl');
+var planbl = require('./bl/planbl');
 
 var _clientSecret = gsecrets.client_secret;
 var _clientID = gsecrets.client_id;
@@ -65,18 +67,27 @@ app.get('/auth/google/callback',
             }
             var auth = google.oauth2('v2');
             auth.userinfo.get({auth: oauth2Client}, function(err, data){
+              
+              var authProvider = 'google';
+              var payload = {id: data.id , authProvider: authProvider};
+              var token = jwt.sign(payload, gsecrets.jwt_secret,
+                {
+                  //expiresIn: '1h'
+                });
+
               var user = new models.user({
-                authProvider: 'google',
+                authProvider: authProvider,
                 authProviderId: data.id,
                 displayName : data.name,     
                 firstname: data.given_name,
-                lastname: data.familiy_name,
+                lastname: data.family_name,
                 gender: data.gender,
                 picture: data.picture,
-                tokens: tokens
+                tokens: tokens,
+                jwt: token
               });
               userbl.createOrUpdate(user, function(err, data){
-                res.redirect('http://localhost:4000/callback?access_token=' + tokens.access_token);
+                res.redirect('http://localhost:4000/callback?access_token=' + token);
               });
             });
           });
@@ -103,35 +114,48 @@ app.use(bodyParser.json());
 //app.use(passport.session());
 app.use(passport.initialize());
 
-
 var http = require('https');
 
 var BearerStrategy = require('passport-http-bearer').Strategy;
 passport.use(new BearerStrategy(
     function(token, done) {
-      oauth2Client.getRequestMetadata(null, function(){
 
+      jwt.verify(token, gsecrets.jwt_secret, function(err, decoded) {
+        if(err){
+          done(err);
+        }else{
+          var query = {
+            authProviderId: decoded.id, 
+            authProvider: decoded.authProvider, 
+            jwt: token};
+          userbl.findByQuery(query, function(err, user){
+            done(err, user);
+          });
+        }
       });
-      var options = {
-          host: 'www.googleapis.com',
-          path: '/oauth2/v3/tokeninfo?access_token=' + token
-        };
+      // oauth2Client.getRequestMetadata(null, function(){
+
+      // });
+      // var options = {
+      //     host: 'www.googleapis.com',
+      //     path: '/oauth2/v3/tokeninfo?access_token=' + token
+      //   };
         
-        http.get(options, function(resp) {
-          var data = '';
-          resp.on('data', (chunk) => {
-              data += chunk;
-          });
+      //   http.get(options, function(resp) {
+      //     var data = '';
+      //     resp.on('data', (chunk) => {
+      //         data += chunk;
+      //     });
             
-          // The whole response has been received. Print out the result.
-          resp.on('end', () => {
-              var json = JSON.parse(data);
-              console.log(data);
-              done(null, json);
-          });
-        }).on('error', function(e) {
-          console.log("Got error: " + e.message);
-        });
+      //     // The whole response has been received. Print out the result.
+      //     resp.on('end', () => {
+      //         var json = JSON.parse(data);
+      //         console.log(data);
+      //         done(null, json);
+      //     });
+      //   }).on('error', function(e) {
+      //     console.log("Got error: " + e.message);
+      //   });
     }
   ));
 
@@ -143,9 +167,35 @@ app.get('/', function(req, res) {
     res.send('<a href="/auth/google">Sign In with Google</a>');
 });
 
-app.get('/plan', passport.authenticate('bearer', { session: false }) ,
+app.get('/plannings', passport.authenticate('bearer', { session: false }) ,
     function(req, res) {
-        var calendar = google.calendar('v3');
+        planbl.getPlannings(req.user._id, function(err, plannings){
+          if(err){
+            res.json(err);
+            return;
+          }
+          res.json(plannings);
+        });
+    }
+);
+
+app.post('/plannings', passport.authenticate('bearer', { session: false }) ,
+function(req, res) {
+  planbl.createPlanning(req.user._id, req.body, function(err, planning){
+    res.json(planning);
+  });
+});
+
+/*
+var calendar = google.calendar('v3');
+        var tokens = {
+            access_token: req.user.tokens.access_token,
+            id_token: req.user.tokens.id_token,
+            expiry_date: req.user.tokens.expiry_date,
+            refresh_token: req.user.tokens.refresh_token,
+            token_type: req.user.tokens.token_type
+        }
+        oauth2Client.setCredentials(tokens);
         calendar.events.list({
           auth: oauth2Client,
           calendarId: 'primary',
@@ -175,9 +225,7 @@ app.get('/plan', passport.authenticate('bearer', { session: false }) ,
 
           res.send(events);
         });
-    }
-);
-
+*/
 app.get('/test', passport.authenticate('bearer', { session: false }) ,
     function(req, res) {
         res.send(req.user.profile);

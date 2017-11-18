@@ -13,12 +13,35 @@ users.findByToken = function(token, callback) {
 	});
 };
 
+users.findByQuery = function(query, cb){
+	
+	//models.db.on('error', console.error.bind(console, 'connection error:'));
+	//models.db.once('open', function() {
+		models.user.find(query ,function(err,users){ 
+			if(err){
+				cb(err);
+				return;
+			}
+			if(users.length != 0){
+				var user = users[0];
+				cb(null, user);
+			}
+			else {  
+				cb({error: "do not know the user .."});
+			} 
+		});
+	//});
+}
+
 users.createOrUpdate = function(user, cb){
 
-	//models.db.on('error', console.error.bind(console, 'connection error:'));
+	// models.db.on('error', console.error.bind(console, 'connection error:'));
 
-	//models.db.once('open', function() {
-		var query = {authProvider: user.authProvider, authProviderId: user.authProviderId};
+	// models.db.once('open', function() {
+		var query = {
+			authProvider: user.authProvider, 
+			authProviderId: user.authProviderId
+		};
 		models.user.find(query, function(err, u){
 			if(err){
 				cb(err);
@@ -28,7 +51,19 @@ users.createOrUpdate = function(user, cb){
 			if(u.length === 0){
 				user.save(cb);
 			}else{
-				models.user.update(query, user, {multi: true}, cb)
+				models.user.update(query,
+					{ 
+						authProvider: user.authProvider,
+						authProviderId: user.authProviderId,
+						displayName : user.displayName,
+						firstname: user.firstname,
+						lastname: user.lastname,
+						gender: user.gender,
+						picture: user.picture,
+						tokens: user.tokens,
+						jwt: user.jwt
+					},
+					{multi: true}, cb);
 			}
 		});
 

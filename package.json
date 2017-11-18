@@ -16,6 +16,7 @@
           "express-session": "^1.15.6",
           "google-auth-library": "^0.11.0",
           "googleapis": "^22.2.0",
+          "jsonwebtoken": "^8.1.0",
           "mongoose": "=4.7.3",
           "nodemailer": "~0.6.3",
           "passport": "^0.4.0",

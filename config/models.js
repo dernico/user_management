@@ -16,7 +16,8 @@ var userSchema = mongoose.Schema({
 		expiry_date: Number,
 		id_token: String,
 		token_type: String
-	}
+	},
+	jwt: String
 });
 
 var planSchema = mongoose.Schema({    
@@ -41,11 +42,22 @@ var userPlanSchema = mongoose.Schema({
 var connection = process.env.MONGOLAB_URI;
 console.log("connection to mongodb: " + connection);
 //mongoose.connect('mongodb://localhost:27017/userManagement'); 
-mongoose.connect(connection);
+mongoose.connect(connection, {
+	useMongoClient: true,
+	server: {
+	  socketOptions: {
+		socketTimeoutMS: 10 * 1000,
+		connectTimeoutMS: 10 * 1000
+	  }
+	}
+});
+mongoose.Promise = global.Promise;
+
 var models = {};
-models.db = mongoose.connection
+models.db = mongoose.connection;
 models.user = mongoose.model('users', userSchema);
 models.plan = mongoose.model('plan', planSchema);
+models.userPlan = mongoose.model('userPlan', userPlanSchema);
 //models.userNotes = mongoose.model('userNotes', userNoteSchema);
 //models.note = mongoose.model('notes', noteSchema);
 
