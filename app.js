@@ -181,7 +181,7 @@ app.get('/plannings', passport.authenticate('bearer', { session: false }) ,
 
 app.post('/plannings', passport.authenticate('bearer', { session: false }) ,
 function(req, res) {
-  planbl.createPlanning(req.user._id, req.body, function(err, planning){
+  planbl.createOrUpdatePlanning(req.user._id, req.body, function(err, planning){
     res.json(planning);
   });
 });

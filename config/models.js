@@ -24,7 +24,18 @@ var planSchema = mongoose.Schema({
 	title : String,
 	startDate: Date,
 	endDate: Date,
-	comments: Array
+	comments: Array,
+	steps: [{
+		title: String,
+		description: String,
+		todos:[{ 
+			title: String,
+			description: String
+		}],
+		location: {lat: String, lng: String},
+		days: Number,
+		order: Number
+	}]
 });
 
 var userPlanSchema = mongoose.Schema({
