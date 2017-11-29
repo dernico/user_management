@@ -15,6 +15,7 @@ var gsecrets = require('./clientSecret').client;
 var models = require('./config/models');
 var userbl = require('./bl/usersbl');
 var planbl = require('./bl/planbl');
+var places = require('./bl/placesbl');
 
 var _clientSecret = gsecrets.client_secret;
 var _clientID = gsecrets.client_id;
@@ -232,12 +233,14 @@ app.get('/test', passport.authenticate('bearer', { session: false }) ,
     }
 );
 
-// app.get('/test', passport.authenticate('jwt', { session: false }) ,
-// function(req, res) {
-//     res.send(req.user.profile);
-// }
-// );
 
+app.get('/places/autocomplete', passport.authenticate('bearer', { session: false }), function(req, res){
+  var query = req.query.q;
+  if(!query){
+    res.send(500);
+  }
+  places.autocomplete(query, function(err, result){ res.json(result)});
+});
 app.listen(port);  
 
 console.log('The App runs on port ' + port);

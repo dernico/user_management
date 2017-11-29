@@ -1,11 +1,12 @@
 
 var webclient = require("../helper/webclient");
 var urlencode = require('querystring');
+var secrets = require('./../clientSecret').client; 
 
 
 var textsearch = "https://maps.googleapis.com/maps/api/place/textsearch/json?";
 var autocomplete = "https://maps.googleapis.com/maps/api/place/autocomplete/json?";
-var places_key = urlencode.escape(process.env.GOOGLE_PLACES_KEY);
+var places_key = secrets.google_places_key;
 var places = {};
 
 places.textsearch = function(query, callback){

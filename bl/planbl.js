@@ -1,5 +1,5 @@
 var models = require('../config/models');  
-var mongoose = require('mongoose');  
+var mongoose = require('mongoose'); 
 
 var plan = {};
 
