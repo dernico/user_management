@@ -10,7 +10,7 @@ var places_key = secrets.google_places_key;
 var places = {};
 
 places.textsearch = function(query, callback){
-	query = urlencode.escape(query);
+	query = query.split(" ").join("+");
 	var url = textsearch + "query=" + query;
 	url += "&key=" + places_key;
 

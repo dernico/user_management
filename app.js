@@ -241,6 +241,14 @@ app.get('/places/autocomplete', passport.authenticate('bearer', { session: false
   }
   places.autocomplete(query, function(err, result){ res.json(result)});
 });
+
+app.get('/places/search', passport.authenticate('bearer', { session: false }), function(req, res){
+  var query = req.query.q;
+  if(!query){
+    res.send(500);
+  }
+  places.textsearch(query, function(err, result){ res.json(result)});
+});
 app.listen(port);  
 
 console.log('The App runs on port ' + port);
