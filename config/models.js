@@ -30,9 +30,10 @@ var planSchema = mongoose.Schema({
 		description: String,
 		todos:[{ 
 			title: String,
-			description: String
+			description: String,
+			location: {lat: Number, lng: Number},
 		}],
-		location: {lat: String, lng: String},
+		location: {lat: Number, lng: Number},
 		days: Number,
 		order: Number
 	}]
@@ -41,6 +42,12 @@ var planSchema = mongoose.Schema({
 var userPlanSchema = mongoose.Schema({
 	userId: String,
 	planId: String
+});
+
+var fileStoreSchema = mongoose.Schema({
+	filename: String,
+	filepath: String,
+	link: String
 });
 
 // var noteSchema = mongoose.Schema({
@@ -69,6 +76,7 @@ models.db = mongoose.connection;
 models.user = mongoose.model('users', userSchema);
 models.plan = mongoose.model('plan', planSchema);
 models.userPlan = mongoose.model('userPlan', userPlanSchema);
+models.fileStore = mongoose.model('fileStore', fileStoreSchema);
 //models.userNotes = mongoose.model('userNotes', userNoteSchema);
 //models.note = mongoose.model('notes', noteSchema);
 

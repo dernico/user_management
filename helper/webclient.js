@@ -52,4 +52,26 @@ function httpsGet(url, callback){
 	});
 }
 
-exports.get = get;
+
+function httpGetImage (url, callback) {
+	https.get(url, function(resp){
+
+		resp.setEncoding('base64');
+		body = "data:" + resp.headers["content-type"] + ";base64,";
+		resp.on('data', function(chunk){
+			body += chunk;
+		});
+		resp.on('end', function(){
+			callback(null, body);
+		});
+
+	}).on("error", function(e){
+		logger.log("Got error: " + e.message);
+		callback(e);
+	});
+}
+
+exports.client = {
+	get: get,
+	getImage: httpGetImage
+};

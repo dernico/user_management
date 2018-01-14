@@ -7,6 +7,7 @@ var connect = require('connect');
 var app      = express(); 
 var port     = process.env.PORT || 4200;
 var cors = require('cors');
+var formidable = require('formidable');
 
 var passport = require('passport');
 var google = require('googleapis');
@@ -16,6 +17,7 @@ var models = require('./config/models');
 var userbl = require('./bl/usersbl');
 var planbl = require('./bl/planbl');
 var places = require('./bl/placesbl');
+var fileStore = require('./bl/filebl');
 
 var _clientSecret = gsecrets.client_secret;
 var _clientID = gsecrets.client_id;
@@ -248,6 +250,40 @@ app.get('/places/search', passport.authenticate('bearer', { session: false }), f
     res.send(500);
   }
   places.textsearch(query, function(err, result){ res.json(result)});
+});
+app.get('/places/details', passport.authenticate('bearer', { session: false }), function(req, res){
+  var placeid = req.query.placeid;
+  if(!placeid){
+    res.send(500);
+  }
+  places.placedetails(placeid, function(err, result){ res.json(result)});
+});
+
+//app.get('/places/photo', passport.authenticate('bearer', { session: false }), function(req, res){
+app.get('/places/photo', function(req, res){
+  var photoid = req.query.photoid;
+  if(!photoid){
+    res.send(500);
+  }
+  places.photo(photoid, function(err, result){ 
+    res.writeHead(200, {'Content-Type': 'image/png'});
+    res.end(result);
+  });
+
+});
+
+
+app.post('/file/upload', passport.authenticate('bearer', { session: false }) ,
+function(req, res) {
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files) {
+      fileStore.saveFiles(form, req.user, fields, files, function(err, file){
+        if(err){
+          res.send(500, err);
+        }
+        res.json(file);
+      });
+    });
 });
 app.listen(port);  
 
