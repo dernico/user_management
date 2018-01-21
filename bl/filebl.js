@@ -11,7 +11,7 @@ file.saveFiles = function(form, user, fields, files, cb){
     file_size = files.file.size,
     file_ext = files.file.name.split('.').pop(),
     index = old_path.lastIndexOf('/') + 1,
-    file_name = old_path.substr(index),
+    file_name = files.file.name.split('.').shift(),
     new_dir = path.join(process.cwd(), '/uploads/', user.id);
     new_path = path.join(new_dir, '/', files.file.name);
 
@@ -31,24 +31,44 @@ file.saveFiles = function(form, user, fields, files, cb){
                     if (err) {
                         cb(err);
                     } else {
-                        var file = new models.fileStore();
-                        file.filename = file_name;
-                        file.filepath = new_path;
-                        file.link = fields.link; // todo: verify link exists (plan, step, todo)
-                        file.save(function(err){
+                        findFile(fields.link, function(err, _file){
                             if(err){
                                 cb(err);
                                 return;
                             }
-                    
-                            cb(null, file);
+                            if(_file){
+                                cb(null, _file);
+                                return;
+                            }
+                            var file = new models.fileStore();
+                            file.filename = file_name;
+                            file.filepath = new_path;
+                            file.link = fields.link; // todo: verify link exists (plan, step, todo)
+                            file.save(function(err){
+                                if(err){
+                                    cb(err);
+                                    return;
+                                }
+                        
+                                cb(null, file);
+                            });
                         });
                     }
                 });
             });
         });
     });
-    
+}
+
+function findFile(link, cb){
+    var query = {link: link};
+    models.fileStore.findOne(query, function(err, _file){
+        if(err){
+            cb(err);
+            return;
+        }
+        cb(err, _file);
+    });
 }
 
 module.exports = file;

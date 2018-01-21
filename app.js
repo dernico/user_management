@@ -273,7 +273,12 @@ app.get('/places/photo', function(req, res){
 });
 
 
-app.post('/file/upload', passport.authenticate('bearer', { session: false }) ,
+app.get('/file', passport.authenticate('bearer', { session: false }) ,
+function(req, res) {
+  res.json();
+});
+
+app.post('/file', passport.authenticate('bearer', { session: false }) ,
 function(req, res) {
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
