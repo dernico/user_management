@@ -46,6 +46,7 @@ var userPlanSchema = mongoose.Schema({
 
 var fileStoreSchema = mongoose.Schema({
 	filename: String,
+	extension: String,
 	filepath: String,
 	link: String
 });

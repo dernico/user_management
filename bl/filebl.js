@@ -6,6 +6,69 @@ var mkdir = require('mkdir-recursive');
 
 var file = {};
 
+file.loadFiles = function(userid, planid, cb){
+    findUserPlan(userid, planid, function(err, userplan){
+        
+        if(err){
+            cb(err);
+            return;
+        }
+        var _files = [];
+        var _planid = mongoose.Types.ObjectId(userplan.planId);
+        models.fileStore.find({ link: userplan.planId }, function(err, files){
+            if(err){
+                //todo: logging
+                console.log(err);
+                return;
+            }
+            files.forEach(function(file){
+                _files.push(file);
+            });
+            
+            models.plan.findOne({_id: _planid}, function(err, plan){
+                if(err){
+                    //todo: logging
+                    console.log(err);
+                    return;
+                }
+                if(plan.steps){
+                    var stepids = [];
+                    for(var i=0; i < plan.steps.length; i++){
+                        stepids.push(plan.steps[i]._id.toString());
+                    }
+                    models.fileStore.find({link: {$in: stepids}}, function(err, files){
+                        if(err){
+                            //todo: logging
+                            console.log(err);
+                            return;
+                        }
+                        files.forEach(function(file){
+                            _files.push(file);
+                        });
+                        cb(null, _files);
+                    });
+                }
+            });
+        });
+    });
+}
+
+function findUserPlan(userid, planid, cb){
+    var query = {userId: userid, planId: planid };
+    models.userPlan.findOne(query, function(err, userplan){
+        if(err){
+            cb(err);
+            return;
+        }
+        if(!userplan){
+            cb({message: "not allowed"});
+            return;
+        }
+        
+        cb(null, userplan);
+    });
+}
+
 file.saveFiles = function(form, user, fields, files, cb){
     var old_path = files.file.path,
     file_size = files.file.size,
@@ -42,6 +105,7 @@ file.saveFiles = function(form, user, fields, files, cb){
                             }
                             var file = new models.fileStore();
                             file.filename = file_name;
+                            file.extension = file_ext;
                             file.filepath = new_path;
                             file.link = fields.link; // todo: verify link exists (plan, step, todo)
                             file.save(function(err){

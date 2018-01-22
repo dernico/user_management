@@ -275,7 +275,13 @@ app.get('/places/photo', function(req, res){
 
 app.get('/file', passport.authenticate('bearer', { session: false }) ,
 function(req, res) {
-  res.json();
+  fileStore.loadFiles(req.user._id, req.query.planid, function(err, files){
+    if(err){
+      res.send(500);
+      return;
+    }
+    res.json(files);
+  });
 });
 
 app.post('/file', passport.authenticate('bearer', { session: false }) ,
