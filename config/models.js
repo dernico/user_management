@@ -25,9 +25,19 @@ var planSchema = mongoose.Schema({
 	startDate: Date,
 	endDate: Date,
 	comments: Array,
+	files: [{
+		filename: String,
+		extension: String,
+		filepath: String
+	}],
 	steps: [{
 		title: String,
 		description: String,
+		files: [{
+			filename: String,
+			extension: String,
+			filepath: String
+		}],
 		todos:[{ 
 			title: String,
 			description: String,
@@ -44,12 +54,6 @@ var userPlanSchema = mongoose.Schema({
 	planId: String
 });
 
-var fileStoreSchema = mongoose.Schema({
-	filename: String,
-	extension: String,
-	filepath: String,
-	link: String
-});
 
 // var noteSchema = mongoose.Schema({
 // 	title: String,
@@ -77,7 +81,7 @@ models.db = mongoose.connection;
 models.user = mongoose.model('users', userSchema);
 models.plan = mongoose.model('plan', planSchema);
 models.userPlan = mongoose.model('userPlan', userPlanSchema);
-models.fileStore = mongoose.model('fileStore', fileStoreSchema);
+//models.fileStore = mongoose.model('fileStore', fileStoreSchema);
 //models.userNotes = mongoose.model('userNotes', userNoteSchema);
 //models.note = mongoose.model('notes', noteSchema);
 

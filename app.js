@@ -291,10 +291,22 @@ function(req, res) {
       fileStore.saveFiles(form, req.user, fields, files, function(err, file){
         if(err){
           res.send(500, err);
+          return;
         }
         res.json(file);
       });
     });
+});
+app.delete('/file', passport.authenticate('bearer', { session: false }) ,
+function(req, res){
+  var id = req.query.id;
+  fileStore.deleteFile(id, function(err){
+    if(err){
+      res.send(500, err);
+      return;
+    }
+    res.send(200, "");
+  });
 });
 app.listen(port);  
 

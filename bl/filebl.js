@@ -6,68 +6,79 @@ var mkdir = require('mkdir-recursive');
 
 var file = {};
 
-file.loadFiles = function(userid, planid, cb){
-    findUserPlan(userid, planid, function(err, userplan){
-        
-        if(err){
-            cb(err);
-            return;
-        }
-        var _files = [];
-        var _planid = mongoose.Types.ObjectId(userplan.planId);
-        models.fileStore.find({ link: userplan.planId }, function(err, files){
-            if(err){
-                //todo: logging
-                console.log(err);
-                return;
-            }
-            files.forEach(function(file){
-                _files.push(file);
-            });
-            
-            models.plan.findOne({_id: _planid}, function(err, plan){
-                if(err){
-                    //todo: logging
-                    console.log(err);
-                    return;
-                }
-                if(plan.steps){
-                    var stepids = [];
-                    for(var i=0; i < plan.steps.length; i++){
-                        stepids.push(plan.steps[i]._id.toString());
-                    }
-                    models.fileStore.find({link: {$in: stepids}}, function(err, files){
-                        if(err){
-                            //todo: logging
-                            console.log(err);
-                            return;
-                        }
-                        files.forEach(function(file){
-                            _files.push(file);
-                        });
-                        cb(null, _files);
-                    });
-                }
-            });
-        });
-    });
-}
+// file.deleteFile = function(fileid, cb){
+//     var query = {_id: mongoose.Types.ObjectId(fileid)};
+//     models.fileStore.remove(query, function(err){
+//         if(err){
+//             cb(err);
+//             return;
+//         }
+//         cb(null);
+//     });
+// }
 
-function findUserPlan(userid, planid, cb){
-    var query = {userId: userid, planId: planid };
-    models.userPlan.findOne(query, function(err, userplan){
-        if(err){
-            cb(err);
-            return;
-        }
-        if(!userplan){
-            cb({message: "not allowed"});
-            return;
-        }
+// file.loadFiles = function(userid, planid, cb){
+//     findUserPlan(userid, planid, function(err, userplan){
         
-        cb(null, userplan);
-    });
-}
+//         if(err){
+//             cb(err);
+//             return;
+//         }
+//         var _files = [];
+//         var _planid = mongoose.Types.ObjectId(userplan.planId);
+//         models.fileStore.find({ link: userplan.planId }, function(err, files){
+//             if(err){
+//                 //todo: logging
+//                 console.log(err);
+//                 return;
+//             }
+//             files.forEach(function(file){
+//                 _files.push(file);
+//             });
+            
+//             models.plan.findOne({_id: _planid}, function(err, plan){
+//                 if(err){
+//                     //todo: logging
+//                     console.log(err);
+//                     return;
+//                 }
+//                 if(plan.steps){
+//                     var stepids = [];
+//                     for(var i=0; i < plan.steps.length; i++){
+//                         stepids.push(plan.steps[i]._id.toString());
+//                     }
+//                     models.fileStore.find({link: {$in: stepids}}, function(err, files){
+//                         if(err){
+//                             //todo: logging
+//                             console.log(err);
+//                             return;
+//                         }
+//                         files.forEach(function(file){
+//                             _files.push(file);
+//                         });
+//                         cb(null, _files);
+//                     });
+//                 }
+//             });
+//         });
+//     });
+// }
+
+// function findUserPlan(userid, planid, cb){
+//     var query = {userId: userid, planId: planid };
+//     models.userPlan.findOne(query, function(err, userplan){
+//         if(err){
+//             cb(err);
+//             return;
+//         }
+//         if(!userplan){
+//             cb({message: "not allowed"});
+//             return;
+//         }
+        
+//         cb(null, userplan);
+//     });
+// }
 
 file.saveFiles = function(form, user, fields, files, cb){
     var old_path = files.file.path,
@@ -94,29 +105,30 @@ file.saveFiles = function(form, user, fields, files, cb){
                     if (err) {
                         cb(err);
                     } else {
-                        findFile(fields.link, function(err, _file){
-                            if(err){
-                                cb(err);
-                                return;
-                            }
-                            if(_file){
-                                cb(null, _file);
-                                return;
-                            }
-                            var file = new models.fileStore();
+                        //findFile(fields.link, function(err, _file){
+                            // if(err){
+                            //     cb(err);
+                            //     return;
+                            // }
+                            // if(_file){
+                            //     cb(null, _file);
+                            //     return;
+                            // }
+                            //var file = new models.fileStore();
+                            var file = {};
                             file.filename = file_name;
                             file.extension = file_ext;
-                            file.filepath = new_path;
-                            file.link = fields.link; // todo: verify link exists (plan, step, todo)
-                            file.save(function(err){
-                                if(err){
-                                    cb(err);
-                                    return;
-                                }
+                            file.filepath = new_path; // todo: verify link exists (plan, step, todo)
+                            cb(null, file);
+                            // file.save(function(err){
+                            //     if(err){
+                            //         cb(err);
+                            //         return;
+                            //     }
                         
-                                cb(null, file);
-                            });
-                        });
+                            //     cb(null, file);
+                            // });
+                        //});
                     }
                 });
             });
