@@ -28,7 +28,8 @@ var planSchema = mongoose.Schema({
 	files: [{
 		filename: String,
 		extension: String,
-		filepath: String
+		fileId: String,
+		url: String
 	}],
 	steps: [{
 		title: String,
@@ -36,7 +37,8 @@ var planSchema = mongoose.Schema({
 		files: [{
 			filename: String,
 			extension: String,
-			filepath: String
+			fileId: String,
+			url: String
 		}],
 		todos:[{ 
 			title: String,

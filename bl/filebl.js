@@ -3,8 +3,96 @@ var mongoose = require('mongoose');
 var fs = require('fs');
 var path = require('path');
 var mkdir = require('mkdir-recursive');
+var crypto = require('crypto');
+
+var uploadFolder = 'uploads'
 
 var file = {};
+
+file.getFile = function(fileid, cb){
+    // todo: dont just use fileid -> use userid and planid, too
+    var folderPath = path.join(process.cwd(), uploadFolder);
+    var filepath = path.join(folderPath, fileid);
+
+    fs.exists(filepath, function(exists){
+        if(exists){
+            //cb(null, fs.createReadStream(filepath), filepath);
+            cb(null, null, filepath);
+        }else{
+            cb({error: "not found"});
+        }        
+    });
+
+}
+
+file.saveFiles = function(form, user, fields, files, cb){
+    var old_path = files.file.path,
+    file_size = files.file.size,
+    file_ext = files.file.name.split('.').pop(),
+    file_name = files.file.name.split('.').shift(),
+    fileId = crypto.createHash('md5').update(files.file.name + user.id).digest('hex'),
+    new_dir = path.join(process.cwd(), uploadFolder),
+    new_path = path.join(new_dir, '/', fileId);
+
+    mkdir.mkdir(new_dir, function(err){
+        if(err){
+            cb(err);
+        }
+        fs.readFile(old_path, function(err, data) {
+            if(err){
+                cb(err);
+            }
+            fs.writeFile(new_path, data, function(err) {
+                if(err){
+                    cb(err);
+                }
+                fs.unlink(old_path, function(err) {
+                    if (err) {
+                        cb(err);
+                    } else {
+                        //findFile(fields.link, function(err, _file){
+                            // if(err){
+                            //     cb(err);
+                            //     return;
+                            // }
+                            // if(_file){
+                            //     cb(null, _file);
+                            //     return;
+                            // }
+                            //var file = new models.fileStore();
+                            var file = {};
+                            file.filename = file_name;
+                            file.extension = file_ext;
+                            file.fileId = fileId;
+                            file.url = fields.url + "/" + fileId;
+                            cb(null, file);
+                            // file.save(function(err){
+                            //     if(err){
+                            //         cb(err);
+                            //         return;
+                            //     }
+                        
+                            //     cb(null, file);
+                            // });
+                        //});
+                    }
+                });
+            });
+        });
+    });
+}
+
+function findFile(link, cb){
+    var query = {link: link};
+    models.fileStore.findOne(query, function(err, _file){
+        if(err){
+            cb(err);
+            return;
+        }
+        cb(err, _file);
+    });
+}
+
 
 // file.deleteFile = function(fileid, cb){
 //     var query = {_id: mongoose.Types.ObjectId(fileid)};
@@ -80,71 +168,5 @@ var file = {};
 //     });
 // }
 
-file.saveFiles = function(form, user, fields, files, cb){
-    var old_path = files.file.path,
-    file_size = files.file.size,
-    file_ext = files.file.name.split('.').pop(),
-    index = old_path.lastIndexOf('/') + 1,
-    file_name = files.file.name.split('.').shift(),
-    new_dir = path.join(process.cwd(), '/uploads/', user.id);
-    new_path = path.join(new_dir, '/', files.file.name);
-
-    mkdir.mkdir(new_dir, function(err){
-        if(err){
-            cb(err);
-        }
-        fs.readFile(old_path, function(err, data) {
-            if(err){
-                cb(err);
-            }
-            fs.writeFile(new_path, data, function(err) {
-                if(err){
-                    cb(err);
-                }
-                fs.unlink(old_path, function(err) {
-                    if (err) {
-                        cb(err);
-                    } else {
-                        //findFile(fields.link, function(err, _file){
-                            // if(err){
-                            //     cb(err);
-                            //     return;
-                            // }
-                            // if(_file){
-                            //     cb(null, _file);
-                            //     return;
-                            // }
-                            //var file = new models.fileStore();
-                            var file = {};
-                            file.filename = file_name;
-                            file.extension = file_ext;
-                            file.filepath = new_path; // todo: verify link exists (plan, step, todo)
-                            cb(null, file);
-                            // file.save(function(err){
-                            //     if(err){
-                            //         cb(err);
-                            //         return;
-                            //     }
-                        
-                            //     cb(null, file);
-                            // });
-                        //});
-                    }
-                });
-            });
-        });
-    });
-}
-
-function findFile(link, cb){
-    var query = {link: link};
-    models.fileStore.findOne(query, function(err, _file){
-        if(err){
-            cb(err);
-            return;
-        }
-        cb(err, _file);
-    });
-}
 
 module.exports = file;

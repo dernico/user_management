@@ -273,14 +273,25 @@ app.get('/places/photo', function(req, res){
 });
 
 
-app.get('/file', passport.authenticate('bearer', { session: false }) ,
+app.get('/file/:fileid', passport.authenticate('bearer', { session: false }) ,
+//app.get('/file/:fileid', 
 function(req, res) {
-  fileStore.loadFiles(req.user._id, req.query.planid, function(err, files){
+  fileStore.getFile(req.params.fileid, function(err, file, filename){
     if(err){
-      res.send(500);
+      res.send(400);
       return;
     }
-    res.json(files);
+    res.sendFile(filename);
+
+    // res.writeHead(200, {
+    //   "Content-Type": "application/octet-stream",
+    //   "Content-Disposition": "attachment; filename=" + "file"
+    // });
+    // file.pipe(res);
+
+    // file.close(function(){
+    //   res.end();
+    // });
   });
 });
 
