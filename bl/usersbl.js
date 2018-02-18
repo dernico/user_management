@@ -42,7 +42,13 @@ users.createOrUpdate = function(user, cb){
 			authProvider: user.authProvider, 
 			authProviderId: user.authProviderId
 		};
-		models.user.find(query, function(err, u){
+		models.user
+			.find()
+			.and([
+				//{authProvider: user.authProvider},
+				{$or: [query, {email: user.email}]}
+			])
+			.exec(function(err, u){
 			if(err){
 				cb(err);
 				return;
@@ -50,11 +56,12 @@ users.createOrUpdate = function(user, cb){
 	
 			if(u.length === 0){
 				user.save(cb);
-			}else{
-				models.user.update(query,
+			}else if(u.length === 1){
+				models.user.update({_id: u[0]._id},
 					{ 
 						authProvider: user.authProvider,
 						authProviderId: user.authProviderId,
+						email: user.email,
 						displayName : user.displayName,
 						firstname: user.firstname,
 						lastname: user.lastname,
@@ -64,6 +71,9 @@ users.createOrUpdate = function(user, cb){
 						jwt: user.jwt
 					},
 					{multi: true}, cb);
+			}
+			else{
+				cb({error: "something went wrong ... to much users."});
 			}
 		});
 

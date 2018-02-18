@@ -40,7 +40,8 @@ app.get(
           // generate a url that asks permissions for Google+ and Google Calendar scopes
           var scopes = [
             'https://www.googleapis.com/auth/plus.me',
-            'https://www.googleapis.com/auth/calendar',
+            'https://www.googleapis.com/auth/userinfo.email',
+            //'https://www.googleapis.com/auth/calendar',
             //'https://www.googleapis.com/auth/userinfo.profile', 
             //'https://www.googleapis.com/auth/userinfo.email'
           ];
@@ -80,6 +81,7 @@ app.get('/auth/google/callback',
 
               var user = new models.user({
                 authProvider: authProvider,
+                email: data.email,
                 authProviderId: data.id,
                 displayName : data.name,     
                 firstname: data.given_name,
@@ -318,6 +320,18 @@ function(req, res){
     }
     res.send(200, "");
   });
+});
+
+
+app.post('/share', passport.authenticate('bearer', { session: false }) ,
+function(req, res) {
+    planbl.share(req.user._id, req.body, function(err, result){
+      if(err){
+        res.send(500, err);
+        return;
+      }
+      res.send(200, result);
+    });
 });
 app.listen(port);  
 

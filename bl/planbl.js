@@ -45,19 +45,76 @@ var createPlanning = function(userid, plan, cb) {
             cb(err);
             return;
         }
-        var userplan = new models.userPlan();
-        userplan.userId = userid.toString();
-        userplan.planId = planning._id.toString();
+        createNewUserPlan(userid.toString(), planning._id.toString(), function(err, userplan){
+            cb(err, planning);
+        });
+    });
+}
+
+/*
+shareObj:{
+	email: the email you want to share to
+	planid: the planning you want to share
+}
+*/
+plan.share = function(fromUserId, shareObj, cb){
+	// 1. check if email exists and if not create new user with just the email adress
+    // 3. create a new entry in userPlan
+    if(!shareObj.email || !shareObj.planid){
+        cb({error: "no email or no planid"});
+        return;
+    }
+    models.user.findOne({email: shareObj.email}, function(err, u){
+        if(err){
+            cb(err);
+            return;
+        }
+        if(u == null){
+            var newUser = new models.user();
+            newUser.email = shareObj.email;
+            newUser.save(function(err, data){
+                if(err){
+                    cb(err);
+                    return;
+                }
+                linkUserAndPlan(newUser, shareObj, cb);
+            });
+        }
+        else{
+            linkUserAndPlan(u, shareObj, cb);
+        }
+    });
+}
+
+function linkUserAndPlan(user, shareObj, cb){
+    
+    var query = { 
+        userId: user._id.toString(),
+        planId: shareObj.planid
+    };
+    models.userPlan.find(query, function(err, userplans){
+        if(err){
+            cb(err);
+            return;
+        }
+        if(userplans.length === 0){
+            createNewUserPlan(query.userId, query.planId, cb);
+        }
+    });
+}
+
+function createNewUserPlan(userid, planid, cb){
+    var userplan = new models.userPlan();
+        userplan.userId = userid;
+        userplan.planId = planid;
         userplan.save(function(err){
             if(err){
                 cb(err);
                 return;
             }
 
-            cb(null, planning);
+            cb(null, userplan);
         });
-    });
 }
-
 
 module.exports = plan;
