@@ -26,6 +26,17 @@ var planSchema = mongoose.Schema({
 	startDate: Date,
 	endDate: Date,
 	comments: Array,
+	users: Array, // array of userids
+	costs: [{
+		amount: Number,
+		for: String,
+		from: {
+			usreid:	String,
+			username: String,
+			userimage: String,
+		},
+		url: String
+	}],
 	files: [{
 		filename: String,
 		extension: String,

@@ -174,7 +174,7 @@ app.get('/', function(req, res) {
 
 app.get('/plannings', passport.authenticate('bearer', { session: false }) ,
     function(req, res) {
-        planbl.getPlannings(req.user._id, function(err, plannings){
+        planbl.getPlannings(req.user, function(err, plannings){
           if(err){
             res.json(err);
             return;

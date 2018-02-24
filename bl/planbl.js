@@ -3,18 +3,71 @@ var mongoose = require('mongoose');
 
 var plan = {};
 
-plan.getPlannings = function(userid, cb){
-    var query = { userId: userid.toString() };
+plan.getPlannings = function(user, cb){
+    var query = { userId: user._id.toString() };
     models.userPlan.find(query, function(err, userPlans){
         var planids = [];
         userPlans.forEach(userPlan => {
             planids.push(mongoose.Types.ObjectId(userPlan.planId));
         });
         
-        models.plan.find( { '_id': { $in: planids } }, function(err, plannings){
-            cb(err, plannings);
+        models.plan.find( { '_id': { $in: planids } }).lean().exec(function(err, plannings){
+            updateUsers(err, user, plannings, cb);
         } );
     });
+}
+
+function updateUsers(err, user, plannings, cb){
+    if(err){
+        return;
+    }
+    if(plannings){
+        var counter = 0;
+        plannings.forEach(plan => {
+            //var plan = plannings[i];
+            var userids = [];
+            if('users' in plan){
+                plan.users.forEach(userid => {
+                    userids.push(mongoose.Types.ObjectId(userid));
+                });
+            }
+            models.user.find({'_id': { $in: userids }}).lean().exec(function(err, users){
+                counter++;
+                if(err){
+                    console.log(err);
+                }
+                var _users = [];
+                if(users){
+                    users.forEach(u => {
+                        _users.push({
+                            '_id': u._id,
+                            email: u.email,
+                            displayName: u.displayName,
+                            firstname: u.firstname,
+                            lastname: u.lastname,
+                            gender: u.gender,
+                            picture: u.picture
+                        });
+                    });
+                }
+                plan.loggedInUser = {
+                    '_id': user._id,
+                    email: user.email,
+                    displayName: user.displayName,
+                    firstname: user.firstname,
+                    lastname: user.lastname,
+                    gender: user.gender,
+                    picture: user.picture
+                };
+                plan.users = _users;
+
+                // when all is done call callback
+                if(counter == plannings.length){
+                    cb(err, plannings);
+                }
+            });
+        });
+    }
 }
 
 plan.createOrUpdatePlanning = function(userid, plan, cb){
@@ -39,7 +92,7 @@ var updatePlanning = function(plan, cb){
 var createPlanning = function(userid, plan, cb) {
     planning = new models.plan();
     planning.title = plan.title;
-
+    planning.users = [userid.toString()];
     planning.save(function(err){
         if(err){
             cb(err);
@@ -92,14 +145,28 @@ function linkUserAndPlan(user, shareObj, cb){
         userId: user._id.toString(),
         planId: shareObj.planid
     };
-    models.userPlan.find(query, function(err, userplans){
+
+    models.plan.findById(mongoose.Types.ObjectId(query.planId), function(err, plan){
         if(err){
             cb(err);
             return;
         }
-        if(userplans.length === 0){
-            createNewUserPlan(query.userId, query.planId, cb);
-        }
+        plan.users.push(query.userId);
+        plan.save(function(err){
+            if(err){
+                cb(err);
+                return;
+            }   
+            models.userPlan.find(query, function(err, userplans){
+                if(err){
+                    cb(err);
+                    return;
+                }
+                if(userplans.length === 0){
+                    createNewUserPlan(query.userId, query.planId, cb);
+                }
+            });
+        });
     });
 }
 
