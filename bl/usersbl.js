@@ -17,7 +17,7 @@ users.findByQuery = function(query, cb){
 	
 	//models.db.on('error', console.error.bind(console, 'connection error:'));
 	//models.db.once('open', function() {
-		models.user.find(query ,function(err,users){ 
+		models.user.find(query).lean().exec(function(err,users){ 
 			if(err){
 				cb(err);
 				return;

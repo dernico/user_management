@@ -27,8 +27,8 @@ function updateUsers(err, user, plannings, cb){
             //var plan = plannings[i];
             var userids = [];
             if('users' in plan){
-                plan.users.forEach(userid => {
-                    userids.push(mongoose.Types.ObjectId(userid));
+                plan.users.forEach(user => {
+                    userids.push(mongoose.Types.ObjectId(user._id));
                 });
             }
             models.user.find({'_id': { $in: userids }}).lean().exec(function(err, users){
@@ -40,7 +40,7 @@ function updateUsers(err, user, plannings, cb){
                 if(users){
                     users.forEach(u => {
                         _users.push({
-                            '_id': u._id,
+                            '_id': u._id.toString(),
                             email: u.email,
                             displayName: u.displayName,
                             firstname: u.firstname,
@@ -70,12 +70,12 @@ function updateUsers(err, user, plannings, cb){
     }
 }
 
-plan.createOrUpdatePlanning = function(userid, plan, cb){
+plan.createOrUpdatePlanning = function(user, plan, cb){
     var planning;
     if('_id' in plan){
         updatePlanning(plan, cb);
     }else{
-        createPlanning(userid, plan, cb);
+        createPlanning(user, plan, cb);
     }
 }
 var updatePlanning = function(plan, cb){
@@ -89,16 +89,18 @@ var updatePlanning = function(plan, cb){
     });
 }
 
-var createPlanning = function(userid, plan, cb) {
+var createPlanning = function(user, plan, cb) {
     planning = new models.plan();
     planning.title = plan.title;
-    planning.users = [userid.toString()];
+    
+    user._id = user._id.toString(); // i want the string here
+    planning.users = [user];
     planning.save(function(err){
         if(err){
             cb(err);
             return;
         }
-        createNewUserPlan(userid.toString(), planning._id.toString(), function(err, userplan){
+        createNewUserPlan(user._id.toString(), planning._id.toString(), function(err, userplan){
             cb(err, planning);
         });
     });
@@ -125,6 +127,8 @@ plan.share = function(fromUserId, shareObj, cb){
         if(u == null){
             var newUser = new models.user();
             newUser.email = shareObj.email;
+            newUser.firstname = shareObj.email;
+            newUser.displayName = shareObj.email;
             newUser.save(function(err, data){
                 if(err){
                     cb(err);
@@ -151,7 +155,7 @@ function linkUserAndPlan(user, shareObj, cb){
             cb(err);
             return;
         }
-        plan.users.push(query.userId);
+        plan.users.push(user);
         plan.save(function(err){
             if(err){
                 cb(err);
