@@ -129,6 +129,7 @@ plan.share = function(fromUserId, shareObj, cb){
             newUser.email = shareObj.email;
             newUser.firstname = shareObj.email;
             newUser.displayName = shareObj.email;
+            newUser.picture = "/nothere.jpg";
             newUser.save(function(err, data){
                 if(err){
                     cb(err);

@@ -31,11 +31,14 @@ var planSchema = mongoose.Schema({
 		amount: Number,
 		for: String,
 		from: {
-			usreid:	String,
-			username: String,
-			userimage: String,
-		},
-		url: String
+			_id: String,
+			email: String,
+			displayName: String,
+			firstname: String,
+			lastname: String,
+			gender: String,
+			picture: String
+		}
 	}],
 	files: [{
 		filename: String,
