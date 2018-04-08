@@ -8,8 +8,34 @@ var textsearch = "https://maps.googleapis.com/maps/api/place/textsearch/json?";
 var autocomplete = "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?";
 var placedetails = "https://maps.googleapis.com/maps/api/place/details/json?";
 var photo = "https://maps.googleapis.com/maps/api/place/photo?";
+var distance = "https://maps.googleapis.com/maps/api/distancematrix/json?";
 var places_key = secrets.google_places_key;
 var places = {};
+
+places.distance = function(query, callback){
+	var url = distance;
+	url += "origins=";
+	url += query.startLat + "," + query.startLng;
+	url += "&destinations=";
+	url += query.endLat + "," + query.endLng;
+	url += "&key=" + places_key;
+
+	webclient.get(url, function(err, result){
+		if(err){
+			callback(err);
+			return;
+		}
+		var distanceResult = JSON.parse(result);
+
+		if(distanceResult.status != "OK"){
+			callback({status:  distanceResult.status});
+			return;
+		}
+
+		callback(null, distanceResult.rows);
+
+	});
+}
 
 places.photo = function(id, callback){
 	var url = photo;

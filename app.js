@@ -274,6 +274,15 @@ app.get('/places/photo', function(req, res){
 
 });
 
+app.get('/places/distance', function(req, res){
+  if(!req.query.startLat || !req.query.startLng || !req.query.endLat || !req.query.endLng){
+    res.send(500);
+  }
+  places.distance(req.query, function(err, result){
+    res.json(result);
+  });
+
+});
 
 app.get('/file/:fileid', passport.authenticate('bearer', { session: false }) ,
 //app.get('/file/:fileid', 
