@@ -281,7 +281,16 @@ app.get('/places/distance', function(req, res){
   places.distance(req.query, function(err, result){
     res.json(result);
   });
+});
 
+app.get('/places/staticmap', function(req, res){
+  if(!req.query.lat || !req.query.lng){
+    res.send(500);
+  }
+  places.staticmap(req.query, function(err, result){ 
+    res.writeHead(200, {'Content-Type': 'image/png'});
+    res.end(result.read());
+  });
 });
 
 app.get('/file/:fileid', passport.authenticate('bearer', { session: false }) ,

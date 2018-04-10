@@ -9,8 +9,29 @@ var autocomplete = "https://maps.googleapis.com/maps/api/place/queryautocomplete
 var placedetails = "https://maps.googleapis.com/maps/api/place/details/json?";
 var photo = "https://maps.googleapis.com/maps/api/place/photo?";
 var distance = "https://maps.googleapis.com/maps/api/distancematrix/json?";
+var staticmap = "https://maps.googleapis.com/maps/api/staticmap?";
 var places_key = secrets.google_places_key;
 var places = {};
+
+places.staticmap = function(query, cb){
+	var zoom = query.zoom ? query.zoom : 13;
+	var horizontal = query.horizontal ? query.horizontal : 400;
+	var vertical = query.vertical ? query.vertical : 300;
+	var url = staticmap;
+	url += "center=" + query.lat + "," + query.lng;
+	url += "&zoom=" + zoom;
+	url += "&size=" + horizontal + "x" + vertical;
+	url += "&key=" + places_key;
+
+	webclient.getImage2(url, function(err, result){
+		if(err){
+			cb(err);
+			return;
+		}
+
+		cb(null, result);
+	});
+}
 
 places.distance = function(query, callback){
 	var url = distance;
