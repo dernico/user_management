@@ -315,6 +315,21 @@ function(req, res) {
   });
 });
 
+
+app.post('/images', passport.authenticate('bearer', { session: false }) ,
+function(req, res) {
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files) {
+      fileStore.saveImages(form, req.user, fields, files, function(err, file){
+        if(err){
+          res.send(500, err);
+          return;
+        }
+        res.json(file);
+      });
+    });
+});
+
 app.post('/file', passport.authenticate('bearer', { session: false }) ,
 function(req, res) {
     var form = new formidable.IncomingForm();
@@ -328,6 +343,7 @@ function(req, res) {
       });
     });
 });
+
 app.delete('/file', passport.authenticate('bearer', { session: false }) ,
 function(req, res){
   var id = req.query.id;

@@ -46,6 +46,12 @@ var planSchema = mongoose.Schema({
 		fileId: String,
 		url: String
 	}],
+	images: [{
+		filename: String,
+		extension: String,
+		fileId: String,
+		url: String
+	}],
 	steps: [{
 		title: String,
 		description: String,

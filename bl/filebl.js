@@ -9,6 +9,19 @@ var uploadFolder = 'uploads'
 
 var file = {};
 
+file.deleteFile = function(fileid, cb){
+    // todo: dont just use fileid -> use userid and planid, too
+    var folderPath = path.join(process.cwd(), uploadFolder);
+    var filepath = path.join(folderPath, fileid);
+
+    fs.exists(filepath, function(exists){
+        if(exists){
+            //cb(null, fs.createReadStream(filepath), filepath);
+            fs.unlink(filepath, cb);
+        }    
+    });
+}
+
 file.getFile = function(fileid, cb){
     // todo: dont just use fileid -> use userid and planid, too
     var folderPath = path.join(process.cwd(), uploadFolder);
@@ -25,12 +38,41 @@ file.getFile = function(fileid, cb){
 
 }
 
+file.saveImages = function(form, user, fields, files, cb){
+    var _files = [];
+    var saveCount = 0;
+    var fileCount = 0;
+    for(var file in files){
+        fileCount++;
+    }
+    if(fileCount == 0){
+        cb("no files");
+    }
+
+    for(var file in files){
+        saveFile(user, fields, files[file], function(err, file){
+            saveCount++;
+            if(err) return;
+
+            _files.push(file);
+            if(saveCount == fileCount){
+                cb(null, _files);
+            }
+        });
+    }
+}
+
 file.saveFiles = function(form, user, fields, files, cb){
-    var old_path = files.file.path,
-    file_size = files.file.size,
-    file_ext = files.file.name.split('.').pop(),
-    file_name = files.file.name.split('.').shift(),
-    fileId = crypto.createHash('md5').update(files.file.name + user.id).digest('hex'),
+    saveFile(user, fields, files.file0, cb);
+}
+
+
+function saveFile(user, fields, file, cb){
+    var old_path = file.path,
+    file_size = file.size,
+    file_ext = file.name.split('.').pop(),
+    file_name = file.name.split('.').shift(),
+    fileId = crypto.createHash('md5').update(file.name + user.id).digest('hex'),
     new_dir = path.join(process.cwd(), uploadFolder),
     new_path = path.join(new_dir, '/', fileId);
 
@@ -50,31 +92,12 @@ file.saveFiles = function(form, user, fields, files, cb){
                     if (err) {
                         cb(err);
                     } else {
-                        //findFile(fields.link, function(err, _file){
-                            // if(err){
-                            //     cb(err);
-                            //     return;
-                            // }
-                            // if(_file){
-                            //     cb(null, _file);
-                            //     return;
-                            // }
-                            //var file = new models.fileStore();
-                            var file = {};
-                            file.filename = file_name;
-                            file.extension = file_ext;
-                            file.fileId = fileId;
-                            file.url = fields.url + "/" + fileId;
-                            cb(null, file);
-                            // file.save(function(err){
-                            //     if(err){
-                            //         cb(err);
-                            //         return;
-                            //     }
-                        
-                            //     cb(null, file);
-                            // });
-                        //});
+                            var _file = {};
+                            _file.filename = file_name;
+                            _file.extension = file_ext;
+                            _file.fileId = fileId;
+                            _file.url = fields.url + "/" + fileId;
+                            cb(null, _file);
                     }
                 });
             });
