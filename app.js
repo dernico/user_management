@@ -92,7 +92,7 @@ app.get('/auth/google/callback',
                 jwt: token
               });
               userbl.createOrUpdate(user, function(err, data){
-                res.redirect('http://localhost:4000/callback?access_token=' + token);
+                res.redirect(gsecrets.client_redirect_uri + '?access_token=' + token);
               });
             });
           });
@@ -124,7 +124,6 @@ var http = require('https');
 var BearerStrategy = require('passport-http-bearer').Strategy;
 passport.use(new BearerStrategy(
     function(token, done) {
-
       jwt.verify(token, gsecrets.jwt_secret, function(err, decoded) {
         if(err){
           done(err);
