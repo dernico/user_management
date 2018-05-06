@@ -38,7 +38,7 @@ file.getFile = function(fileid, cb){
 
 }
 
-file.saveImages = function(form, user, fields, files, cb){
+file.saveFiles = function(form, user, fields, files, cb){
     var _files = [];
     var saveCount = 0;
     var fileCount = 0;
@@ -60,10 +60,6 @@ file.saveImages = function(form, user, fields, files, cb){
             }
         });
     }
-}
-
-file.saveFiles = function(form, user, fields, files, cb){
-    saveFile(user, fields, files.file0, cb);
 }
 
 
