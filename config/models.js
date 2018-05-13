@@ -18,7 +18,9 @@ var userSchema = mongoose.Schema({
 		id_token: String,
 		token_type: String
 	},
-	jwt: String
+	jwt: String,
+	hashed_password: String,
+	salt: String 
 });
 
 var planSchema = mongoose.Schema({    

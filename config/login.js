@@ -11,7 +11,7 @@ module.exports.login = function(email,password,callback) {
 
 			var temp = users[0].salt; 
 			var hash_db = users[0].hashed_password; 
-			var token = users[0].token; 
+			var token = users[0].jwt; 
 			var _id = users[0]._id;
 			var email = users[0].email;
 			var newpass = temp + password; 

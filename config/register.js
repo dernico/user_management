@@ -1,7 +1,9 @@
 var crypto = require('crypto'); 
 var rand = require('csprng'); 
 var mongoose = require('mongoose'); 
-var models = require('./models');    
+var models = require('./models');   
+var jwt = require('jsonwebtoken'); 
+var gsecrets = require('../clientSecret').client;
 
 
 module.exports.register = function(email,password,callback) {  
@@ -15,14 +17,44 @@ module.exports.register = function(email,password,callback) {
 
 			var temp =rand(160, 36); 
 			var newpass = temp + password; 
-			var token = crypto.createHash('sha512').update(email +rand).digest("hex"); 
+			//var token = crypto.createHash('sha512').update(email +rand).digest("hex"); 
 			var hashed_password = crypto.createHash('sha512').update(newpass).digest("hex");  
 
-			var newuser = new models.user({    
-			     token: token,   
-			     email: email,   
-			     hashed_password: hashed_password,   
-			     salt :temp });  
+			/*
+	authProvider: String,
+	authProviderId: String,
+    email : String,     
+    displayName : String,     
+	firstname: String,
+	lastname: String,
+	gender: String,
+	picture: String,
+	tokens: {
+		access_token: String,
+		refresh_token: String,
+		expiry_date: Number,
+		id_token: String,
+		token_type: String
+	},
+	jwt: String
+			*/
+
+			var authProvider = 'email';
+			var newuser = new models.user({
+				authProvider: authProvider,
+				email: email,
+				displayname: email,
+				picture: "/nothere.jpg",
+			    hashed_password: hashed_password,
+				salt :temp 
+			});  
+			var payload = {id: newuser.id , authProvider: authProvider};
+			var token = jwt.sign(payload, gsecrets.jwt_secret,
+			{
+				//expiresIn: '1h'
+			});
+			newuser.authProviderId = newuser.id;
+			newuser.jwt = token;
 
 			models.user.find({email: email},function(err,users){  
 
@@ -35,11 +67,11 @@ module.exports.register = function(email,password,callback) {
 				    		console.error(err);
 				    		callback({'success': false, 'response': "Error creating"});
 				    	}else{
-				    		callback({'success': true, 'response':"Sucessfully Registered"});  
+							callback({'success': true, token: token, 'response':"Sucessfully Registered"}); 
 				    	}
 					}); 
 				}else{    
-	     			callback({'success': false, 'response':"Email already Registered"});  
+	     			callback({'success': false, token: token, 'response':"Email already Registered"});  
 				}
 			});
 		}else{      

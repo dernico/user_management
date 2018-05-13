@@ -14,6 +14,8 @@ var google = require('googleapis');
 var jwt = require('jsonwebtoken');
 var gsecrets = require('./clientSecret').client;
 var models = require('./config/models');
+var register = require('./config/register');
+var login = require('./config/login');
 var userbl = require('./bl/usersbl');
 var planbl = require('./bl/planbl');
 var places = require('./bl/placesbl');
@@ -169,6 +171,17 @@ passport.use(new BearerStrategy(
 
 app.get('/', function(req, res) {       
     res.send('<a href="/auth/google">Sign In with Google</a>');
+});
+
+app.post('/login', function(req, res){
+  login.login(req.body.email, req.body.password, function(result){
+    res.json(result);
+  });
+});
+app.post('/register', function(req, res){
+  register.register(req.body.email, req.body.password, function(result){
+    res.json(result);
+  });
 });
 
 app.get('/plannings', passport.authenticate('bearer', { session: false }) ,
