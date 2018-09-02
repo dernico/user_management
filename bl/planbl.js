@@ -119,7 +119,7 @@ plan.share = function(fromUserId, shareObj, cb){
         cb({error: "no email or no planid"});
         return;
     }
-    models.user.findOne({email: shareObj.email}, function(err, u){
+    models.user.findOne({email: shareObj.email}).lean().exec(function(err, u){
         if(err){
             cb(err);
             return;
@@ -156,7 +156,7 @@ function linkUserAndPlan(user, shareObj, cb){
             cb(err);
             return;
         }
-        plan.users.push(user);
+        plan.users = plan.users.concat([user]);
         plan.save(function(err){
             if(err){
                 cb(err);

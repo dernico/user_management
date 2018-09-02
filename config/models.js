@@ -66,6 +66,7 @@ var planSchema = mongoose.Schema({
 		todos:[{ 
 			title: String,
 			description: String,
+			costs: Number,
 			location: {lat: Number, lng: Number},
 		}],
 		location: {lat: Number, lng: Number},

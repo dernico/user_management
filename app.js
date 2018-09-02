@@ -333,7 +333,7 @@ function(req, res) {
     form.parse(req, function(err, fields, files) {
       fileStore.saveFiles(form, req.user, fields, files, function(err, file){
         if(err){
-          res.send(500, err);
+          res.status(500).send(result);
           return;
         }
         res.json(file);
@@ -346,7 +346,7 @@ function(req, res){
   var id = req.query.id;
   fileStore.deleteFile(id, function(err){
     if(err){
-      res.send(500, err);
+      res.status(500).send(result);
       return;
     }
     res.send(200, "");
@@ -358,10 +358,10 @@ app.post('/share', passport.authenticate('bearer', { session: false }) ,
 function(req, res) {
     planbl.share(req.user._id, req.body, function(err, result){
       if(err){
-        res.send(500, err);
+        res.status(500).send(result);
         return;
       }
-      res.send(200, result);
+      res.status(200).send(result);
     });
 });
 app.listen(port);  
