@@ -199,111 +199,67 @@ app.get('/plannings', passport.authenticate('bearer', { session: false }) ,
 app.post('/plannings', passport.authenticate('bearer', { session: false }) ,
 function(req, res) {
   planbl.createOrUpdatePlanning(req.user, req.body, function(err, planning){
-    res.json(planning);
+    planbl.getPlannings(req.user, function(err, plannings){
+      res.json(plannings);
+    });
   });
 });
 
-/*
-var calendar = google.calendar('v3');
-        var tokens = {
-            access_token: req.user.tokens.access_token,
-            id_token: req.user.tokens.id_token,
-            expiry_date: req.user.tokens.expiry_date,
-            refresh_token: req.user.tokens.refresh_token,
-            token_type: req.user.tokens.token_type
-        }
-        oauth2Client.setCredentials(tokens);
-        calendar.events.list({
-          auth: oauth2Client,
-          calendarId: 'primary',
-          timeMin: (new Date()).toISOString(),
-          maxResults: 10,
-          singleEvents: true,
-          orderBy: 'startTime'
-        }, function(err, response) {
-          if (err) {
-            console.log('The API returned an error: ' + err);
-            res.send({error: err});
-            return;
-          }
-          var events = response.items;
-          if (events.length == 0) {
-            console.log('No upcoming events found.');
-          } 
-          else 
-          {
-            console.log('Upcoming 10 events:');
-            for (var i = 0; i < events.length; i++) {
-              var event = events[i];
-              var start = event.start.dateTime || event.start.date;
-              console.log('%s - %s', start, event.summary);
-            }
-          }
 
-          res.send(events);
-        });
-*/
-app.get('/test', passport.authenticate('bearer', { session: false }) ,
-    function(req, res) {
-        res.send(req.user.profile);
-    }
-);
+// app.get('/places/autocomplete', passport.authenticate('bearer', { session: false }), function(req, res){
+//   var query = req.query.q;
+//   if(!query){
+//     res.send(500);
+//   }
+//   places.autocomplete(query, function(err, result){ res.json(result)});
+// });
 
+// app.get('/places/search', passport.authenticate('bearer', { session: false }), function(req, res){
+//   var query = req.query.q;
+//   if(!query){
+//     res.send(500);
+//   }
+//   places.textsearch(query, function(err, result){ res.json(result)});
+// });
+// app.get('/places/details', passport.authenticate('bearer', { session: false }), function(req, res){
+//   var placeid = req.query.placeid;
+//   if(!placeid){
+//     res.send(500);
+//   }
+//   places.placedetails(placeid, function(err, result){ res.json(result)});
+// });
 
-app.get('/places/autocomplete', passport.authenticate('bearer', { session: false }), function(req, res){
-  var query = req.query.q;
-  if(!query){
-    res.send(500);
-  }
-  places.autocomplete(query, function(err, result){ res.json(result)});
-});
+// //app.get('/places/photo', passport.authenticate('bearer', { session: false }), function(req, res){
+// app.get('/places/photo', function(req, res){
+//   var photoid = req.query.photoid;
+//   if(!photoid){
+//     res.send(500);
+//   }
+//   places.photo(photoid, function(err, result){ 
+//     res.writeHead(200, {'Content-Type': 'image/png'});
+//     res.end(result);
+//   });
 
-app.get('/places/search', passport.authenticate('bearer', { session: false }), function(req, res){
-  var query = req.query.q;
-  if(!query){
-    res.send(500);
-  }
-  places.textsearch(query, function(err, result){ res.json(result)});
-});
-app.get('/places/details', passport.authenticate('bearer', { session: false }), function(req, res){
-  var placeid = req.query.placeid;
-  if(!placeid){
-    res.send(500);
-  }
-  places.placedetails(placeid, function(err, result){ res.json(result)});
-});
+// });
 
-//app.get('/places/photo', passport.authenticate('bearer', { session: false }), function(req, res){
-app.get('/places/photo', function(req, res){
-  var photoid = req.query.photoid;
-  if(!photoid){
-    res.send(500);
-  }
-  places.photo(photoid, function(err, result){ 
-    res.writeHead(200, {'Content-Type': 'image/png'});
-    res.end(result);
-  });
+// app.get('/places/distance', function(req, res){
+//   if(!req.query.startLat || !req.query.startLng || !req.query.endLat || !req.query.endLng){
+//     res.send(500);
+//   }
+//   places.distance(req.query, function(err, result){
+//     res.json(result);
+//   });
+// });
 
-});
-
-app.get('/places/distance', function(req, res){
-  if(!req.query.startLat || !req.query.startLng || !req.query.endLat || !req.query.endLng){
-    res.send(500);
-  }
-  places.distance(req.query, function(err, result){
-    res.json(result);
-  });
-});
-
-app.get('/places/staticmap', function(req, res){
-  if(!req.query.lat || !req.query.lng){
-    res.send(500);
-  }
-  places.staticmap(req.query, function(err, result){ 
-    res.writeHead(200, {'Content-Type': 'image/png'});
-    res.end(result.read());
-  });
-});
+// app.get('/places/staticmap', function(req, res){
+//   if(!req.query.lat || !req.query.lng){
+//     res.send(500);
+//   }
+//   places.staticmap(req.query, function(err, result){ 
+//     res.writeHead(200, {'Content-Type': 'image/png'});
+//     res.end(result.read());
+//   });
+// });
 
 app.get('/file/:fileid', passport.authenticate('bearer', { session: false }) ,
 //app.get('/file/:fileid', 

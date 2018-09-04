@@ -11,7 +11,7 @@ plan.getPlannings = function(user, cb){
             planids.push(mongoose.Types.ObjectId(userPlan.planId));
         });
         
-        models.plan.find( { '_id': { $in: planids } }).lean().exec(function(err, plannings){
+        models.plan.find( { '_id': { $in: planids } }).exec(function(err, plannings){
             updateUsers(err, user, plannings, cb);
         } );
     });
@@ -85,7 +85,9 @@ var updatePlanning = function(plan, cb){
             cb(err);
             return;
         }
-        models.plan.update(query, plan, cb);
+        models.plan.update(query, plan, function(err, result){
+            cb(err, result);
+        });
     });
 }
 
