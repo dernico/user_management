@@ -1,7 +1,6 @@
 
 var webclient = require("../helper/webclient").client;
 var urlencode = require('querystring');
-var secrets = require('./../clientSecret').client; 
 
 
 var textsearch = "https://maps.googleapis.com/maps/api/place/textsearch/json?";
@@ -10,7 +9,7 @@ var placedetails = "https://maps.googleapis.com/maps/api/place/details/json?";
 var photo = "https://maps.googleapis.com/maps/api/place/photo?";
 var distance = "https://maps.googleapis.com/maps/api/distancematrix/json?";
 var staticmap = "https://maps.googleapis.com/maps/api/staticmap?";
-var places_key = secrets.google_places_key;
+var places_key = process.env.PLACES_API_KEY;
 var places = {};
 
 places.staticmap = function(query, cb){
