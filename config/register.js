@@ -3,7 +3,6 @@ var rand = require('csprng');
 var mongoose = require('mongoose'); 
 var models = require('./models');   
 var jwt = require('jsonwebtoken'); 
-var gsecrets = require('../clientSecret').client;
 
 
 module.exports.register = function(email,password,callback) {  
