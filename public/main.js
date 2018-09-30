@@ -939,6 +939,7 @@ var Configs = (function () {
     Configs.mapsApiKey = 'AIzaSyAcLB4ukiK5M2tuVLK4P2kIyib7vUDt_r8';
     //public static baseUrl = 'http://localhost:4200';
     Configs.baseUrl = 'https://hidden-taiga-84499.herokuapp.com';
+    Configs.googleAuth = 'https://hidden-taiga-84499.herokuapp.com/auth/google';
     Configs.loginUrl = Configs.baseUrl + '/login';
     Configs.registerUrl = Configs.baseUrl + '/register';
     Configs.planningsUrl = Configs.baseUrl + '/plannings';
@@ -1129,7 +1130,7 @@ var Todo = (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "\r\n<h2>It seems you need to login again</h2>\r\n\r\n<h3>At the moment you can only login with your google account. More Provider will be added soon ...</h3>\r\n\r\n\r\n\r\n<h4>Login with E-Mail</h4>\r\n<mat-form-field>\r\n    <input matInput [(ngModel)]=\"emailAdress\" type=\"email\" placeholder=\"Your email adress\">\r\n</mat-form-field>\r\n\r\n<mat-form-field>\r\n    <input matInput [(ngModel)]=\"password\" type=\"password\" placeholder=\"Your password\">\r\n</mat-form-field>\r\n\r\n<button mat-raised-button (click)=\"login()\">Login</button>\r\n\r\n\r\n<h4><a target=\"_self\" rel=\"noopener\" href=\"/register\">Register with E-Mail</a></h4>\r\n\r\n\r\n<h4><a target=\"_self\" rel=\"noopener\" href=\"http://localhost:4200/auth/google\">Login with Google</a></h4>\r\n"
+module.exports = "\r\n<h2>It seems you need to login again</h2>\r\n\r\n<h3>At the moment you can only login with your google account. More Provider will be added soon ...</h3>\r\n\r\n\r\n\r\n<h4>Login with E-Mail</h4>\r\n<mat-form-field>\r\n    <input matInput [(ngModel)]=\"emailAdress\" type=\"email\" placeholder=\"Your email adress\">\r\n</mat-form-field>\r\n\r\n<mat-form-field>\r\n    <input matInput [(ngModel)]=\"password\" type=\"password\" placeholder=\"Your password\">\r\n</mat-form-field>\r\n\r\n<button mat-raised-button (click)=\"login()\">Login</button>\r\n\r\n\r\n<h4><a target=\"_self\" rel=\"noopener\" href=\"/register\">Register with E-Mail</a></h4>\r\n\r\n\r\n<h4><a target=\"_self\" rel=\"noopener\" [href]=\"googleAuth\">Login with Google</a></h4>\r\n"
 
 /***/ }),
 
@@ -1170,6 +1171,7 @@ var LoginComponent = (function () {
         this.route = route;
         this.router = router;
         this.authService = authService;
+        this.googleAuth = _configs__WEBPACK_IMPORTED_MODULE_5__["Configs"].googleAuth;
     }
     LoginComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -2559,7 +2561,7 @@ module.exports = ""
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<!--The content below is only a placeholder and can be replaced.-->\n<div style=\"text-align:center\">\n  <h1>\n    Welcome to {{title}}!\n  </h1>\n\n  <h3>\n    With plan it you can plan your next awesome trip ... \n    You can plan your routes, invite your travel mates, \n    add documents, share images you made,\n    calculate costs and see a weather forecast.\n  </h3>\n\n  <h4>At the moment you can only login with your email adress or your google account. More Provider will be added soon ...</h4>\n\n  <h4><a target=\"_self\" rel=\"noopener\" href=\"/callback\">Login with E-Mail</a></h4>\n  <h4><a target=\"_self\" rel=\"noopener\" href=\"http://localhost:4200/auth/google\">Login with Google</a></h4>\n\n</div>\n  \n  \n"
+module.exports = "<!--The content below is only a placeholder and can be replaced.-->\n<div style=\"text-align:center\">\n  <h1>\n    Welcome to {{title}}!\n  </h1>\n\n  <h3>\n    With plan it you can plan your next awesome trip ... \n    You can plan your routes, invite your travel mates, \n    add documents, share images you made,\n    calculate costs and see a weather forecast.\n  </h3>\n\n  <h4>At the moment you can only login with your email adress or your google account. More Provider will be added soon ...</h4>\n\n  <h4><a target=\"_self\" rel=\"noopener\" href=\"/callback\">Login with E-Mail</a></h4>\n  <h4><a target=\"_self\" rel=\"noopener\" [href]=\"googleAuth\">Login with Google</a></h4>\n\n</div>\n  \n  \n"
 
 /***/ }),
 
@@ -2576,6 +2578,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/esm5/core.js");
 /* harmony import */ var _services_auth_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../services/auth.service */ "./src/app/services/auth.service.ts");
 /* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/esm5/router.js");
+/* harmony import */ var _configs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../configs */ "./src/app/configs.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -2588,11 +2591,12 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 
 
 
+
 var StartComponent = (function () {
     function StartComponent(authService, router) {
         this.authService = authService;
         this.router = router;
-        this.title = 'plan it';
+        this.googleAuth = _configs__WEBPACK_IMPORTED_MODULE_3__["Configs"].googleAuth;
     }
     StartComponent.prototype.ngOnInit = function () {
         if (this.authService.getAccessToken()) {
