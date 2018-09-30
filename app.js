@@ -169,9 +169,9 @@ passport.use(new BearerStrategy(
 
 //require('./routes/routes.js')(app);  
 
-app.get('/', function(req, res) {       
-    res.send('<a href="/auth/google">Sign In with Google</a>');
-});
+// app.get('/', function(req, res) {       
+//     res.send('<a href="/auth/google">Sign In with Google</a>');
+// });
 
 app.post('/login', function(req, res){
   login.login(req.body.email, req.body.password, function(result){
