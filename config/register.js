@@ -49,7 +49,7 @@ module.exports.register = function(email,password,callback) {
 				salt :temp 
 			});  
 			var payload = {id: newuser.id , authProvider: authProvider};
-			var token = jwt.sign(payload, gsecrets.jwt_secret,
+			var token = jwt.sign(payload, process.env.JWT_SECRET,
 			{
 				//expiresIn: '1h'
 			});
