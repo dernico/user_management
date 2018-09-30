@@ -12,7 +12,6 @@ var formidable = require('formidable');
 var passport = require('passport');
 var google = require('googleapis');
 var jwt = require('jsonwebtoken');
-var gsecrets = require('./clientSecret').client;
 var models = require('./config/models');
 var register = require('./config/register');
 var login = require('./config/login');
@@ -21,9 +20,9 @@ var planbl = require('./bl/planbl');
 var places = require('./bl/placesbl');
 var fileStore = require('./bl/filebl');
 
-var _clientSecret = gsecrets.client_secret;
-var _clientID = gsecrets.client_id;
-var _callbackURL = gsecrets.redirect_uri;
+var _clientSecret = process.env.CLIENT_SECRET;
+var _clientID = process.env.CLIENT_ID;
+var _callbackURL = process.env.REDIRECT_URI;
 
 var OAuth2 = google.auth.OAuth2;
 
@@ -76,7 +75,7 @@ app.get('/auth/google/callback',
               
               var authProvider = 'google';
               var payload = {id: data.id , authProvider: authProvider};
-              var token = jwt.sign(payload, gsecrets.jwt_secret,
+              var token = jwt.sign(payload, process.env.JWT_SECRET,
                 {
                   //expiresIn: '1h'
                 });
@@ -94,7 +93,7 @@ app.get('/auth/google/callback',
                 jwt: token
               });
               userbl.createOrUpdate(user, function(err, data){
-                res.redirect(gsecrets.client_redirect_uri + '?access_token=' + token);
+                res.redirect(process.env.CLIENT_REDIRECT_URI + '?access_token=' + token);
               });
             });
           });
@@ -126,7 +125,7 @@ var http = require('https');
 var BearerStrategy = require('passport-http-bearer').Strategy;
 passport.use(new BearerStrategy(
     function(token, done) {
-      jwt.verify(token, gsecrets.jwt_secret, function(err, decoded) {
+      jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
         if(err){
           done(err);
         }else{
