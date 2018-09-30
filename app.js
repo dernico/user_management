@@ -206,60 +206,60 @@ function(req, res) {
 });
 
 
-// app.get('/places/autocomplete', passport.authenticate('bearer', { session: false }), function(req, res){
-//   var query = req.query.q;
-//   if(!query){
-//     res.send(500);
-//   }
-//   places.autocomplete(query, function(err, result){ res.json(result)});
-// });
+app.get('/places/autocomplete', passport.authenticate('bearer', { session: false }), function(req, res){
+  var query = req.query.q;
+  if(!query){
+    res.send(500);
+  }
+  places.autocomplete(query, function(err, result){ res.json(result)});
+});
 
-// app.get('/places/search', passport.authenticate('bearer', { session: false }), function(req, res){
-//   var query = req.query.q;
-//   if(!query){
-//     res.send(500);
-//   }
-//   places.textsearch(query, function(err, result){ res.json(result)});
-// });
-// app.get('/places/details', passport.authenticate('bearer', { session: false }), function(req, res){
-//   var placeid = req.query.placeid;
-//   if(!placeid){
-//     res.send(500);
-//   }
-//   places.placedetails(placeid, function(err, result){ res.json(result)});
-// });
+app.get('/places/search', passport.authenticate('bearer', { session: false }), function(req, res){
+  var query = req.query.q;
+  if(!query){
+    res.send(500);
+  }
+  places.textsearch(query, function(err, result){ res.json(result)});
+});
+app.get('/places/details', passport.authenticate('bearer', { session: false }), function(req, res){
+  var placeid = req.query.placeid;
+  if(!placeid){
+    res.send(500);
+  }
+  places.placedetails(placeid, function(err, result){ res.json(result)});
+});
 
-// //app.get('/places/photo', passport.authenticate('bearer', { session: false }), function(req, res){
-// app.get('/places/photo', function(req, res){
-//   var photoid = req.query.photoid;
-//   if(!photoid){
-//     res.send(500);
-//   }
-//   places.photo(photoid, function(err, result){ 
-//     res.writeHead(200, {'Content-Type': 'image/png'});
-//     res.end(result);
-//   });
+//app.get('/places/photo', passport.authenticate('bearer', { session: false }), function(req, res){
+app.get('/places/photo', function(req, res){
+  var photoid = req.query.photoid;
+  if(!photoid){
+    res.send(500);
+  }
+  places.photo(photoid, function(err, result){ 
+    res.writeHead(200, {'Content-Type': 'image/png'});
+    res.end(result);
+  });
 
-// });
+});
 
-// app.get('/places/distance', function(req, res){
-//   if(!req.query.startLat || !req.query.startLng || !req.query.endLat || !req.query.endLng){
-//     res.send(500);
-//   }
-//   places.distance(req.query, function(err, result){
-//     res.json(result);
-//   });
-// });
+app.get('/places/distance', function(req, res){
+  if(!req.query.startLat || !req.query.startLng || !req.query.endLat || !req.query.endLng){
+    res.send(500);
+  }
+  places.distance(req.query, function(err, result){
+    res.json(result);
+  });
+});
 
-// app.get('/places/staticmap', function(req, res){
-//   if(!req.query.lat || !req.query.lng){
-//     res.send(500);
-//   }
-//   places.staticmap(req.query, function(err, result){ 
-//     res.writeHead(200, {'Content-Type': 'image/png'});
-//     res.end(result.read());
-//   });
-// });
+app.get('/places/staticmap', function(req, res){
+  if(!req.query.lat || !req.query.lng){
+    res.send(500);
+  }
+  places.staticmap(req.query, function(err, result){ 
+    res.writeHead(200, {'Content-Type': 'image/png'});
+    res.end(result.read());
+  });
+});
 
 app.get('/file/:fileid', passport.authenticate('bearer', { session: false }) ,
 //app.get('/file/:fileid', 
