@@ -1,6 +1,7 @@
 var http = require('http');
 var https = require('https');
 var logger = require('../logger');
+var Stream = require('stream').Transform;
 
 
 function get(url, callback){
@@ -52,4 +53,44 @@ function httpsGet(url, callback){
 	});
 }
 
-exports.get = get;
+
+function httpGetImage (url, callback) {
+	https.get(url, function(resp){
+
+		resp.setEncoding('base64');
+		body = "data:" + resp.headers["content-type"] + ";base64,";
+		resp.on('data', function(chunk){
+			body += chunk;
+		});
+		resp.on('end', function(){
+			callback(null, body);
+		});
+
+	}).on("error", function(e){
+		logger.log("Got error: " + e.message);
+		callback(e);
+	});
+}
+
+function httpGetImage2 (url, callback) {
+	https.get(url, function(resp){
+		var body = new Stream();
+		
+		resp.on('data', function(chunk){
+			body.push(chunk);
+		});
+		resp.on('end', function(){
+			callback(null, body);
+		});
+
+	}).on("error", function(e){
+		logger.log("Got error: " + e.message);
+		callback(e);
+	});
+}
+
+exports.client = {
+	get: get,
+	getImage: httpGetImage,
+	getImage2: httpGetImage2
+};
