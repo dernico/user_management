@@ -3,7 +3,6 @@
  */ 
 var express  = require('express'); 
 var bodyParser = require('body-parser');
-var connect = require('connect'); 
 var app      = express(); 
 var port     = process.env.PORT || 4200;
 var cors = require('cors');
@@ -12,6 +11,8 @@ var formidable = require('formidable');
 var passport = require('passport');
 var google = require('googleapis');
 var jwt = require('jsonwebtoken');
+var path = require('path');
+
 var models = require('./config/models');
 var register = require('./config/register');
 var login = require('./config/login');
@@ -320,6 +321,13 @@ function(req, res) {
       res.status(200).send(result);
     });
 });
+
+// Send all other requests to the Angular app
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/index.html'));
+});
+
+
 app.listen(port);  
 
 console.log('The App runs on port ' + port);
