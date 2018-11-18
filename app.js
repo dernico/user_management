@@ -265,12 +265,22 @@ app.get('/places/staticmap', function(req, res){
 app.get('/file/:fileid', passport.authenticate('bearer', { session: false }) ,
 //app.get('/file/:fileid', 
 function(req, res) {
-  fileStore.getFile(req.params.fileid, function(err, file, filename){
+  fileStore.getFile(req.params.fileid, function(err, file, filepath){
     if(err){
       res.send(400);
       return;
     }
-    res.sendFile(filename);
+
+    if(file){
+      res.type('md');
+      res.send(file.data);
+      return;
+    }
+    if(filepath){
+      res.sendFile(filepath);
+      return;
+    }
+    res.send(400);
 
     // res.writeHead(200, {
     //   "Content-Type": "application/octet-stream",
@@ -298,9 +308,9 @@ function(req, res) {
     });
 });
 
-app.delete('/file', passport.authenticate('bearer', { session: false }) ,
+app.delete('/file/:fileid', passport.authenticate('bearer', { session: false }) ,
 function(req, res){
-  var id = req.query.id;
+  var id = req.params.fileid;
   fileStore.deleteFile(id, function(err){
     if(err){
       res.status(500).send(result);

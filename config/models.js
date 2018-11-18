@@ -79,6 +79,12 @@ var planSchema = mongoose.Schema({
 	}]
 });
 
+
+var fileStoreSchema = mongoose.Schema({
+	fileId: String,
+	data: Buffer
+});
+
 var userPlanSchema = mongoose.Schema({
 	userId: String,
 	planId: String
@@ -111,7 +117,7 @@ models.db = mongoose.connection;
 models.user = mongoose.model('users', userSchema);
 models.plan = mongoose.model('plan', planSchema);
 models.userPlan = mongoose.model('userPlan', userPlanSchema);
-//models.fileStore = mongoose.model('fileStore', fileStoreSchema);
+models.fileStore = mongoose.model('fileStore', fileStoreSchema);
 //models.userNotes = mongoose.model('userNotes', userNoteSchema);
 //models.note = mongoose.model('notes', noteSchema);
 

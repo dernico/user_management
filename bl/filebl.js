@@ -6,35 +6,53 @@ var mkdir = require('mkdir-recursive');
 var crypto = require('crypto');
 
 var uploadFolder = 'uploads'
+var saveOnFileSystem = false;
 
 var file = {};
 
 file.deleteFile = function(fileid, cb){
-    // todo: dont just use fileid -> use userid and planid, too
-    var folderPath = path.join(process.cwd(), uploadFolder);
-    var filepath = path.join(folderPath, fileid);
 
-    fs.exists(filepath, function(exists){
-        if(exists){
-            //cb(null, fs.createReadStream(filepath), filepath);
-            fs.unlink(filepath, cb);
-        }    
-    });
+    if(saveOnFileSystem){
+        // todo: dont just use fileid -> use userid and planid, too
+        var folderPath = path.join(process.cwd(), uploadFolder);
+        var filepath = path.join(folderPath, fileid);
+
+        fs.exists(filepath, function(exists){
+            if(exists){
+                //cb(null, fs.createReadStream(filepath), filepath);
+                fs.unlink(filepath, cb);
+            }    
+        });
+    }
+    else{
+        var query = {fileId: fileid};
+        models.fileStore.remove(query, function(err){
+            cb(err);
+        });
+    }
 }
 
 file.getFile = function(fileid, cb){
-    // todo: dont just use fileid -> use userid and planid, too
-    var folderPath = path.join(process.cwd(), uploadFolder);
-    var filepath = path.join(folderPath, fileid);
 
-    fs.exists(filepath, function(exists){
-        if(exists){
-            //cb(null, fs.createReadStream(filepath), filepath);
-            cb(null, null, filepath);
-        }else{
-            cb({error: "not found"});
-        }        
-    });
+    if(saveOnFileSystem){
+        // todo: dont just use fileid -> use userid and planid, too
+        var folderPath = path.join(process.cwd(), uploadFolder);
+        var filepath = path.join(folderPath, fileid);
+
+        fs.exists(filepath, function(exists){
+            if(exists){
+                //cb(null, fs.createReadStream(filepath), filepath);
+                cb(null, null, filepath);
+            }else{
+                cb({error: "not found"});
+            }        
+        });
+    }else{
+        var query = {fileId: fileid};
+        models.fileStore.findOne(query, function(err, file){
+            cb(err, file);
+        });
+    }
 
 }
 
@@ -64,11 +82,57 @@ file.saveFiles = function(form, user, fields, files, cb){
 
 
 function saveFile(user, fields, file, cb){
-    var old_path = file.path,
-    file_size = file.size,
-    file_ext = file.name.split('.').pop(),
-    file_name = file.name.split('.').shift(),
+
+    if(saveOnFileSystem){
+        saveOnFileSystem(fields, file, cb);
+        return;
+    }
+
+    saveInMongo(fields, file, user, cb);
+}
+
+function saveInMongo(fields, file, user, cb){
+    var file_size = file.size,
+    old_path = file.path,
+    fileExt = file.name.split('.').pop(),
+    fileName = file.name.split('.').shift(),
+    fileId = crypto.createHash('md5').update(file.name + user.id).digest('hex');
+
+    var query = {fileId: fileId};
+    models.fileStore.findOne(query, function(err, _file){
+        if(err){
+            cb(err);
+            return;
+        }
+        if(!_file){
+            var newFileData = new models.fileStore();
+            newFileData.fileId = fileId;
+            newFileData.data = fs.readFileSync(old_path);
+            newFileData.save(function(err, file){        
+                var fileDto = {};
+                fileDto.filename = fileName;
+                fileDto.extension = fileExt;
+                fileDto.fileId = fileId;
+                fileDto.url = fields.url + "/" + fileId;
+                cb(null, fileDto);
+            });
+        }else{
+            var fileDto = {};
+            fileDto.filename = fileName;
+            fileDto.extension = fileExt;
+            fileDto.fileId = fileId;
+            fileDto.url = fields.url + "/" + fileId;
+            cb(null, fileDto);
+        }
+    });
+}
+
+function saveOnFileSystem(fields, file, cb){
+    var file_size = file.size,
+    fileExt = file.name.split('.').pop(),
+    fileName = file.name.split('.').shift(),
     fileId = crypto.createHash('md5').update(file.name + user.id).digest('hex'),
+    old_path = file.path,
     new_dir = path.join(process.cwd(), uploadFolder),
     new_path = path.join(new_dir, '/', fileId);
 
@@ -89,8 +153,8 @@ function saveFile(user, fields, file, cb){
                         cb(err);
                     } else {
                             var _file = {};
-                            _file.filename = file_name;
-                            _file.extension = file_ext;
+                            _file.filename = fileName;
+                            _file.extension = fileExt;
                             _file.fileId = fileId;
                             _file.url = fields.url + "/" + fileId;
                             cb(null, _file);
@@ -98,17 +162,6 @@ function saveFile(user, fields, file, cb){
                 });
             });
         });
-    });
-}
-
-function findFile(link, cb){
-    var query = {link: link};
-    models.fileStore.findOne(query, function(err, _file){
-        if(err){
-            cb(err);
-            return;
-        }
-        cb(err, _file);
     });
 }
 
