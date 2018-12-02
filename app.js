@@ -136,7 +136,8 @@ passport.use(new BearerStrategy(
             authProvider: decoded.authProvider, 
             jwt: token};
           userbl.findByQuery(query, function(err, user){
-            done(err, user);
+            var result = user || false;
+            done(null, result);
           });
         }
       });
