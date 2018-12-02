@@ -35,6 +35,7 @@ var oauth2Client = new OAuth2(
   );
 
 
+  var bearerMidelewarOptions = { session: false, failureRedirect: '/' };
   
 app.get(
     '/auth/google',
@@ -175,6 +176,7 @@ passport.use(new BearerStrategy(
 //     res.send('<a href="/auth/google">Sign In with Google</a>');
 // });
 
+
 app.post('/login', function(req, res){
   login.login(req.body.email, req.body.password, function(result){
     res.json(result);
@@ -186,7 +188,7 @@ app.post('/register', function(req, res){
   });
 });
 
-app.get('/plannings', passport.authenticate('bearer', { session: false }) ,
+app.get('/plannings', passport.authenticate('bearer', bearerMidelewarOptions) ,
     function(req, res) {
         planbl.getPlannings(req.user, function(err, plannings){
           if(err){
@@ -198,7 +200,7 @@ app.get('/plannings', passport.authenticate('bearer', { session: false }) ,
     }
 );
 
-app.post('/plannings', passport.authenticate('bearer', { session: false }) ,
+app.post('/plannings', passport.authenticate('bearer', bearerMidelewarOptions) ,
 function(req, res) {
   planbl.createOrUpdatePlanning(req.user, req.body, function(err, planning){
     planbl.getPlannings(req.user, function(err, plannings){
@@ -208,7 +210,7 @@ function(req, res) {
 });
 
 
-app.get('/places/autocomplete', passport.authenticate('bearer', { session: false }), function(req, res){
+app.get('/places/autocomplete', passport.authenticate('bearer', bearerMidelewarOptions), function(req, res){
   var query = req.query.q;
   if(!query){
     res.send(500);
@@ -216,14 +218,14 @@ app.get('/places/autocomplete', passport.authenticate('bearer', { session: false
   places.autocomplete(query, function(err, result){ res.json(result)});
 });
 
-app.get('/places/search', passport.authenticate('bearer', { session: false }), function(req, res){
+app.get('/places/search', passport.authenticate('bearer', bearerMidelewarOptions), function(req, res){
   var query = req.query.q;
   if(!query){
     res.send(500);
   }
   places.textsearch(query, function(err, result){ res.json(result)});
 });
-app.get('/places/details', passport.authenticate('bearer', { session: false }), function(req, res){
+app.get('/places/details', passport.authenticate('bearer', bearerMidelewarOptions), function(req, res){
   var placeid = req.query.placeid;
   if(!placeid){
     res.send(500);
@@ -231,7 +233,7 @@ app.get('/places/details', passport.authenticate('bearer', { session: false }), 
   places.placedetails(placeid, function(err, result){ res.json(result)});
 });
 
-//app.get('/places/photo', passport.authenticate('bearer', { session: false }), function(req, res){
+//app.get('/places/photo', passport.authenticate('bearer', bearerMidelewarOptions), function(req, res){
 app.get('/places/photo', function(req, res){
   var photoid = req.query.photoid;
   if(!photoid){
@@ -263,7 +265,7 @@ app.get('/places/staticmap', function(req, res){
   });
 });
 
-app.get('/file/:fileid', passport.authenticate('bearer', { session: false }) ,
+app.get('/file/:fileid', passport.authenticate('bearer', bearerMidelewarOptions) ,
 //app.get('/file/:fileid', 
 function(req, res) {
   fileStore.getFile(req.params.fileid, function(err, file, filepath){
@@ -295,7 +297,7 @@ function(req, res) {
   });
 });
 
-app.post('/file', passport.authenticate('bearer', { session: false }) ,
+app.post('/file', passport.authenticate('bearer', bearerMidelewarOptions) ,
 function(req, res) {
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
@@ -309,7 +311,7 @@ function(req, res) {
     });
 });
 
-app.delete('/file/:fileid', passport.authenticate('bearer', { session: false }) ,
+app.delete('/file/:fileid', passport.authenticate('bearer', bearerMidelewarOptions) ,
 function(req, res){
   var id = req.params.fileid;
   fileStore.deleteFile(id, function(err){
@@ -322,7 +324,7 @@ function(req, res){
 });
 
 
-app.post('/share', passport.authenticate('bearer', { session: false }) ,
+app.post('/share', passport.authenticate('bearer', bearerMidelewarOptions) ,
 function(req, res) {
     planbl.share(req.user._id, req.body, function(err, result){
       if(err){
