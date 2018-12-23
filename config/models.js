@@ -103,12 +103,8 @@ console.log("connection to mongodb: " + connection);
 //mongoose.connect('mongodb://localhost:27017/userManagement'); 
 mongoose.connect(connection, {
 	useMongoClient: true,
-	server: {
-	  socketOptions: {
-		socketTimeoutMS: 10 * 1000,
-		connectTimeoutMS: 10 * 1000
-	  }
-	}
+	socketTimeoutMS: 30 * 1000,
+	connectTimeoutMS: 30 * 1000
 });
 mongoose.Promise = global.Promise;
 

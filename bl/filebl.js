@@ -115,7 +115,7 @@ function saveInMongo(fields, file, user, cb){
                 fileDto.fileId = fileId;
                 fileDto.url = fields.url + "/" + fileId;
                 cb(null, fileDto);
-            });
+            },{wtimeout: 10 * 1000});
         }else{
             var fileDto = {};
             fileDto.filename = fileName;

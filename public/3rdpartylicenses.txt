@@ -555,9 +555,9 @@ MIT
 
 @angular/material/card
 
-@angular/material/list
-
 @angular/material/icon
+
+@angular/material/list
 
 @angular/material/divider
 
