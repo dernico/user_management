@@ -67,7 +67,9 @@ var planSchema = mongoose.Schema({
 			title: String,
 			description: String,
 			costs: Number,
+			infos: Object,
 			location: {lat: Number, lng: Number},
+			order: Number
 		}],
 		location: {lat: Number, lng: Number},
 		distance: {
